@@ -1,8 +1,8 @@
 {
-  "name": "@baseswapfi/router-sdk",
+  "name": "@baseswapfi/smart-order-router",
   "version": "1.0.0",
   "author": "0xShoegazer",
-  "module": "dist/router-sdk.esm.js",
+  "module": "dist/smart-order-router.esm.js",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -17,6 +17,11 @@
     "node": ">=10"
   },
   "scripts": {
+    "compile-v3-types": "npx typechain --target ethers-v5 --out-dir src/types/v3 './node_modules/@uniswap/?(v3-core|v3-periphery)/artifacts/contracts/**/*.json'",
+    "compile-v2-types": "npx typechain --target ethers-v5 --out-dir src/types/v2 './node_modules/@uniswap/?(v2-core|v2-periphery)/build/*UniswapV2*.json'",
+    "compile-router": "npx typechain --target ethers-v5 --out-dir src/types/other './node_modules/@uniswap/swap-router-contracts/artifacts/contracts/**/*.json'",
+    "compile-narwhal": "npx typechain --target ethers-v5 --out-dir src/types/other './node_modules/@uniswap/narwhal/artifacts/contracts/**/*.json'",
+    "compile-external-types": "npx typechain --target ethers-v5 --out-dir src/types/other 'src/abis/**/*.json'",
     "start": "tsdx watch",
     "build": "tsdx build",
     "test": "tsdx test",
@@ -29,8 +34,8 @@
     "@baseswapfi/router-sdk": "^1.0.0",
     "@baseswapfi/sdk-core": "^1.0.5",
     "@baseswapfi/v2-sdk": "^1.0.1",
-    "@uniswap/swap-router-contracts": "1.1.0",
     "@uniswap/default-token-list": "^11.2.0",
+    "@uniswap/swap-router-contracts": "1.1.0",
     "async-retry": "^1.3.1",
     "await-timeout": "^1.1.1",
     "axios": "^0.21.1",
@@ -46,30 +51,31 @@
   },
   "devDependencies": {
     "@size-limit/preset-small-lib": "^8.2.6",
+    "@typechain/ethers-v5": "^7.0.1",
+    "@types/async-retry": "^1.4.4",
+    "@types/await-timeout": "^0.3.1",
+    "@types/bunyan": "^1.8.6",
+    "@types/bunyan-blackhole": "^0.2.2",
     "husky": "^8.0.3",
     "size-limit": "^8.2.6",
     "tsdx": "^0.14.1",
     "tslib": "^2.6.2",
-    "typescript": "^5.1.6"
+    "ts-node": "^10.8.1",
+    "typechain": "^5.0.0",
+    "typescript": "^4.2.2"
   },
   "husky": {
     "hooks": {
       "pre-commit": "tsdx lint"
     }
   },
-  "prettier": {
-    "printWidth": 80,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "es5"
-  },
   "size-limit": [
     {
-      "path": "dist/router-sdk.cjs.production.min.js",
+      "path": "dist/smart-order-router.cjs.production.min.js",
       "limit": "10 KB"
     },
     {
-      "path": "dist/router-sdk.esm.js",
+      "path": "dist/smart-order-router.esm.js",
       "limit": "10 KB"
     }
   ]
