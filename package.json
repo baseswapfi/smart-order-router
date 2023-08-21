@@ -1,0 +1,76 @@
+{
+  "name": "@baseswapfi/router-sdk",
+  "version": "1.0.0",
+  "author": "0xShoegazer",
+  "module": "dist/router-sdk.esm.js",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test",
+    "lint": "tsdx lint",
+    "prepublishOnly": "yarn build",
+    "size": "size-limit",
+    "analyze": "size-limit --why"
+  },
+  "dependencies": {
+    "@baseswapfi/router-sdk": "^1.0.0",
+    "@baseswapfi/sdk-core": "^1.0.5",
+    "@baseswapfi/v2-sdk": "^1.0.1",
+    "@uniswap/swap-router-contracts": "1.1.0",
+    "@uniswap/default-token-list": "^11.2.0",
+    "async-retry": "^1.3.1",
+    "await-timeout": "^1.1.1",
+    "axios": "^0.21.1",
+    "bunyan": "^1.8.15",
+    "bunyan-blackhole": "^1.1.1",
+    "ethers": "^5.7.2",
+    "graphql": "^15.5.0",
+    "graphql-request": "^3.4.0",
+    "lodash": "^4.17.21",
+    "mnemonist": "^0.38.3",
+    "node-cache": "^5.1.2",
+    "stats-lite": "^2.2.0"
+  },
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "^8.2.6",
+    "husky": "^8.0.3",
+    "size-limit": "^8.2.6",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.6.2",
+    "typescript": "^5.1.6"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "size-limit": [
+    {
+      "path": "dist/router-sdk.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/router-sdk.esm.js",
+      "limit": "10 KB"
+    }
+  ]
+}
