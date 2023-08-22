@@ -33,6 +33,14 @@ export type TokenAccessor = {
   getAllTokens: () => Token[];
 };
 
+export const USDC_OPTIMISM = new Token(
+  ChainId.OPTIMISM,
+  '0x7F5c764cBc14f9669B88837ca1490cCa17c31607',
+  6,
+  'USDC',
+  'USD//C'
+);
+
 // Base Tokens
 export const USDC_BASE = new Token(
   ChainId.BASE,
