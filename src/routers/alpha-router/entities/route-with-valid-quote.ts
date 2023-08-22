@@ -3,12 +3,13 @@ import { Protocol } from '@baseswapfi/router-sdk';
 import { Token, TradeType } from '@baseswapfi/sdk-core';
 import { Pool } from '@baseswapfi/v3-sdk2';
 import _ from 'lodash';
-import { CurrencyAmount } from '../../../util/amounts';
 
+import { IV2PoolProvider } from '../../../providers/v2/pool-provider';
+import { IV3PoolProvider } from '../../../providers/v3/pool-provider';
+import { CurrencyAmount } from '../../../util/amounts';
+import { routeToString } from '../../../util/routes';
 import { MixedRoute, V2Route, V3Route } from '../../router';
 import { IGasModel } from '../gas-models/gas-model';
-import { IV2PoolProvider, IV3PoolProvider } from '../../../providers/v2/pool-provider';
-import { routeToString } from '../../../util/routes';
 
 /**
  * Represents a route, a quote for swapping some amount on it, and other
@@ -59,7 +60,6 @@ export type V2RouteWithValidQuoteParams = {
   tradeType: TradeType;
   v2PoolProvider: IV2PoolProvider;
 };
-
 /**
  * Represents a quote for swapping on a V2 only route. Contains all information
  * such as the route used, the amount specified by the user, the type of quote

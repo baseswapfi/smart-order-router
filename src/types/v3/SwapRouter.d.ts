@@ -2,31 +2,30 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import {
-  ethers,
-  EventFilter,
-  Signer,
-  BigNumber,
-  BigNumberish,
-  PopulatedTransaction,
-  BaseContract,
-  ContractTransaction,
-  Overrides,
-  PayableOverrides,
-  CallOverrides,
-} from "ethers";
+import { FunctionFragment, Result } from "@ethersproject/abi";
 import { BytesLike } from "@ethersproject/bytes";
 import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
+import {
+  BaseContract,
+  BigNumber,
+  BigNumberish,
+  CallOverrides,
+  ContractTransaction,
+  ethers,
+  Overrides,
+  PayableOverrides,
+  PopulatedTransaction,
+  Signer,
+} from "ethers";
+import { TypedEvent, TypedEventFilter, TypedListener } from "./commons";
 
 interface SwapRouterInterface extends ethers.utils.Interface {
   functions: {
     "WETH9()": FunctionFragment;
-    "exactInput((bytes,address,uint256,uint256,uint256))": FunctionFragment;
-    "exactInputSingle((address,address,uint24,address,uint256,uint256,uint256,uint160))": FunctionFragment;
-    "exactOutput((bytes,address,uint256,uint256,uint256))": FunctionFragment;
-    "exactOutputSingle((address,address,uint24,address,uint256,uint256,uint256,uint160))": FunctionFragment;
+    "exactInput(tuple)": FunctionFragment;
+    "exactInputSingle(tuple)": FunctionFragment;
+    "exactOutput(tuple)": FunctionFragment;
+    "exactOutputSingle(tuple)": FunctionFragment;
     "factory()": FunctionFragment;
     "multicall(bytes[])": FunctionFragment;
     "refundETH()": FunctionFragment;

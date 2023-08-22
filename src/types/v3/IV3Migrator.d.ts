@@ -2,28 +2,27 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import {
-  ethers,
-  EventFilter,
-  Signer,
-  BigNumber,
-  BigNumberish,
-  PopulatedTransaction,
-  BaseContract,
-  ContractTransaction,
-  Overrides,
-  PayableOverrides,
-  CallOverrides,
-} from "ethers";
+import { FunctionFragment, Result } from "@ethersproject/abi";
 import { BytesLike } from "@ethersproject/bytes";
 import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
+import {
+  BaseContract,
+  BigNumber,
+  BigNumberish,
+  CallOverrides,
+  ContractTransaction,
+  ethers,
+  Overrides,
+  PayableOverrides,
+  PopulatedTransaction,
+  Signer,
+} from "ethers";
+import { TypedEvent, TypedEventFilter, TypedListener } from "./commons";
 
 interface IV3MigratorInterface extends ethers.utils.Interface {
   functions: {
     "createAndInitializePoolIfNecessary(address,address,uint24,uint160)": FunctionFragment;
-    "migrate((address,uint256,uint8,address,address,uint24,int24,int24,uint256,uint256,address,uint256,bool))": FunctionFragment;
+    "migrate(tuple)": FunctionFragment;
     "multicall(bytes[])": FunctionFragment;
     "selfPermit(address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
     "selfPermitAllowed(address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;

@@ -2,29 +2,28 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import {
-  ethers,
-  EventFilter,
-  Signer,
-  BigNumber,
-  BigNumberish,
-  PopulatedTransaction,
-  BaseContract,
-  ContractTransaction,
-  Overrides,
-  PayableOverrides,
-  CallOverrides,
-} from "ethers";
+import { FunctionFragment, Result } from "@ethersproject/abi";
 import { BytesLike } from "@ethersproject/bytes";
 import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
+import {
+  BaseContract,
+  BigNumber,
+  BigNumberish,
+  CallOverrides,
+  ContractTransaction,
+  ethers,
+  Overrides,
+  PayableOverrides,
+  PopulatedTransaction,
+  Signer,
+} from "ethers";
+import { TypedEvent, TypedEventFilter, TypedListener } from "./commons";
 
 interface PairFlashInterface extends ethers.utils.Interface {
   functions: {
     "WETH9()": FunctionFragment;
     "factory()": FunctionFragment;
-    "initFlash((address,address,uint24,uint256,uint256,uint24,uint24))": FunctionFragment;
+    "initFlash(tuple)": FunctionFragment;
     "refundETH()": FunctionFragment;
     "swapRouter()": FunctionFragment;
     "sweepToken(address,uint256,address)": FunctionFragment;

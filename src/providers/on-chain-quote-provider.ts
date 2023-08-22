@@ -329,7 +329,8 @@ export class OnChainQuoteProvider implements IOnChainQuoteProvider {
     blockNumber: BigNumber;
   }> {
     const useMixedRouteQuoter =
-      routes.some(route => route.protocol === Protocol.V2) || routes.some(route => route.protocol === Protocol.MIXED);
+      routes.some((route) => route.protocol === Protocol.V2) ||
+      routes.some((route) => route.protocol === Protocol.MIXED);
 
     /// Validate that there are no incorrect routes / function combinations
     this.validateRoutes(routes, functionName, useMixedRouteQuoter);
@@ -346,7 +347,7 @@ export class OnChainQuoteProvider implements IOnChainQuoteProvider {
     };
 
     const inputs: [string, string][] = _(routes)
-      .flatMap(route => {
+      .flatMap((route) => {
         const encodedRoute =
           route.protocol === Protocol.V3
             ? encodeRouteToPath(
@@ -356,7 +357,7 @@ export class OnChainQuoteProvider implements IOnChainQuoteProvider {
             : encodeMixedRouteToPath(
                 route instanceof V2Route ? new MixedRouteSDK(route.pairs, route.input, route.output) : route
               );
-        const routeInputs: [string, string][] = amounts.map(amount => [
+        const routeInputs: [string, string][] = amounts.map((amount) => [
           encodedRoute,
           `0x${amount.quotient.toString(16)}`,
         ]);
@@ -366,7 +367,7 @@ export class OnChainQuoteProvider implements IOnChainQuoteProvider {
 
     const normalizedChunk = Math.ceil(inputs.length / Math.ceil(inputs.length / multicallChunk));
     const inputsChunked = _.chunk(inputs, normalizedChunk);
-    let quoteStates: QuoteBatchState[] = _.map(inputsChunked, inputChunk => {
+    let quoteStates: QuoteBatchState[] = _.map(inputsChunked, (inputChunk) => {
       return {
         status: 'pending',
         inputs: inputChunk,
@@ -374,9 +375,10 @@ export class OnChainQuoteProvider implements IOnChainQuoteProvider {
     });
 
     log.info(
-      `About to get ${inputs.length} quotes in chunks of ${normalizedChunk} [${_.map(inputsChunked, i => i.length).join(
-        ','
-      )}] ${
+      `About to get ${inputs.length} quotes in chunks of ${normalizedChunk} [${_.map(
+        inputsChunked,
+        (i) => i.length
+      ).join(',')}] ${
         gasLimitOverride ? `with a gas limit override of ${gasLimitOverride}` : ''
       } and block number: ${await providerConfig.blockNumber} [Original before offset: ${originalBlockNumber}].`
     );
@@ -397,7 +399,11 @@ export class OnChainQuoteProvider implements IOnChainQuoteProvider {
     const expectedCallsMade = quoteStates.length;
     let totalCallsMade = 0;
 
-    const { results: quoteResults, blockNumber, approxGasUsedPerSuccessCall } = await retry(
+    const {
+      results: quoteResults,
+      blockNumber,
+      approxGasUsedPerSuccessCall,
+    } = await retry(
       async (_bail, attemptNumber) => {
         haveIncrementedBlockHeaderFailureCounter = false;
         finalAttemptNumber = attemptNumber;
@@ -454,7 +460,7 @@ export class OnChainQuoteProvider implements IOnChainQuoteProvider {
                 inputs,
                 results,
               } as QuoteBatchSuccess;
-            } catch (err) {
+            } catch (err: any) {
               // Error from providers have huge messages that include all the calldata and fill the logs.
               // Catch them and rethrow with shorter message.
               if (err.message.includes('header not found')) {
@@ -514,7 +520,7 @@ export class OnChainQuoteProvider implements IOnChainQuoteProvider {
           retryAll = true;
         }
 
-        const reasonForFailureStr = _.map(failedQuoteStates, failedQuoteState => failedQuoteState.reason.name).join(
+        const reasonForFailureStr = _.map(failedQuoteStates, (failedQuoteState) => failedQuoteState.reason.name).join(
           ', '
         );
 
@@ -553,8 +559,9 @@ export class OnChainQuoteProvider implements IOnChainQuoteProvider {
 
                 if (blockHeaderRetryAttemptNumber >= attemptsBeforeRollback && !blockHeaderRolledBack) {
                   log.info(
-                    `Attempt ${attemptNumber}. Have failed due to block header ${blockHeaderRetryAttemptNumber -
-                      1} times. Rolling back block number by ${rollbackBlockOffset} for next retry`
+                    `Attempt ${attemptNumber}. Have failed due to block header ${
+                      blockHeaderRetryAttemptNumber - 1
+                    } times. Rolling back block number by ${rollbackBlockOffset} for next retry`
                   );
                   providerConfig.blockNumber = providerConfig.blockNumber
                     ? (await providerConfig.blockNumber) + rollbackBlockOffset
@@ -602,7 +609,7 @@ export class OnChainQuoteProvider implements IOnChainQuoteProvider {
           const normalizedChunk = Math.ceil(inputs.length / Math.ceil(inputs.length / multicallChunk));
 
           const inputsChunked = _.chunk(inputs, normalizedChunk);
-          quoteStates = _.map(inputsChunked, inputChunk => {
+          quoteStates = _.map(inputsChunked, (inputChunk) => {
             return {
               status: 'pending',
               inputs: inputChunk,
@@ -637,13 +644,13 @@ export class OnChainQuoteProvider implements IOnChainQuoteProvider {
           throw new Error(`Failed to get ${failedQuoteStates.length} quotes. Reasons: ${reasonForFailureStr}`);
         }
 
-        const callResults = _.map(successfulQuoteStates, quoteState => quoteState.results);
+        const callResults = _.map(successfulQuoteStates, (quoteState) => quoteState.results);
 
         return {
-          results: _.flatMap(callResults, result => result.results),
+          results: _.flatMap(callResults, (result) => result.results),
           blockNumber: BigNumber.from(callResults[0]!.blockNumber),
           approxGasUsedPerSuccessCall: stats.percentile(
-            _.map(callResults, result => result.approxGasUsedPerSuccessCall),
+            _.map(callResults, (result) => result.approxGasUsedPerSuccessCall),
             100
           ),
         };
@@ -668,14 +675,13 @@ export class OnChainQuoteProvider implements IOnChainQuoteProvider {
 
     const [successfulQuotes, failedQuotes] = _(routesQuotes)
       .flatMap((routeWithQuotes: RouteWithQuotes<TRoute>) => routeWithQuotes[1])
-      .partition(quote => quote.quote != null)
+      .partition((quote) => quote.quote != null)
       .value();
 
     log.info(
-      `Got ${successfulQuotes.length} successful quotes, ${
-        failedQuotes.length
-      } failed quotes. Took ${finalAttemptNumber -
-        1} attempt loops. Total calls made to provider: ${totalCallsMade}. Have retried for timeout: ${haveRetriedForTimeout}`
+      `Got ${successfulQuotes.length} successful quotes, ${failedQuotes.length} failed quotes. Took ${
+        finalAttemptNumber - 1
+      } attempt loops. Total calls made to provider: ${totalCallsMade}. Have retried for timeout: ${haveRetriedForTimeout}`
     );
 
     return { routesWithQuotes: routesQuotes, blockNumber };
@@ -761,10 +767,10 @@ export class OnChainQuoteProvider implements IOnChainQuoteProvider {
     // and batch them together before logging to minimize number of logs.
     const debugChunk = 80;
     _.forEach(_.chunk(debugFailedQuotes, debugChunk), (quotes, idx) => {
-      const failedQuotesByRoute = _.groupBy(quotes, q => q.route);
-      const failedFlat = _.mapValues(failedQuotesByRoute, f =>
+      const failedQuotesByRoute = _.groupBy(quotes, (q) => q.route);
+      const failedFlat = _.mapValues(failedQuotesByRoute, (f) =>
         _(f)
-          .map(f => `${f.percent}%[${f.amount}]`)
+          .map((f) => `${f.percent}%[${f.amount}]`)
           .join(',')
       );
 
@@ -788,12 +794,12 @@ export class OnChainQuoteProvider implements IOnChainQuoteProvider {
       return null;
     }
 
-    const results = _.map(successfulQuoteStates, quoteState => quoteState.results);
+    const results = _.map(successfulQuoteStates, (quoteState) => quoteState.results);
 
-    const blockNumbers = _.map(results, result => result.blockNumber);
+    const blockNumbers = _.map(results, (result) => result.blockNumber);
 
     const uniqBlocks = _(blockNumbers)
-      .map(blockNumber => blockNumber.toNumber())
+      .map((blockNumber) => blockNumber.toNumber())
       .uniq()
       .value();
 
@@ -818,7 +824,7 @@ export class OnChainQuoteProvider implements IOnChainQuoteProvider {
     haveRetriedForSuccessRate: boolean
   ): void | SuccessRateError {
     const numResults = allResults.length;
-    const numSuccessResults = allResults.filter(result => result.success).length;
+    const numSuccessResults = allResults.filter((result) => result.success).length;
 
     const successRate = (1.0 * numSuccessResults) / numResults;
 
@@ -847,7 +853,7 @@ export class OnChainQuoteProvider implements IOnChainQuoteProvider {
     useMixedRouteQuoter: boolean
   ) {
     /// We do not send any V3Routes to new qutoer becuase it is not deployed on chains besides mainnet
-    if (routes.some(route => route.protocol === Protocol.V3) && useMixedRouteQuoter) {
+    if (routes.some((route) => route.protocol === Protocol.V3) && useMixedRouteQuoter) {
       throw new Error(`Cannot use mixed route quoter with V3 routes`);
     }
 
