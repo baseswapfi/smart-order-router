@@ -18,7 +18,6 @@ import {
   COST_PER_INIT_TICK,
   COST_PER_UNINIT_TICK,
   SINGLE_HOP_OVERHEAD,
-  TOKEN_OVERHEAD,
 } from './gas-costs';
 import { SwapOptionsUniversalRouter, SwapType } from '../../../router';
 
@@ -302,7 +301,9 @@ export class V3HeuristicGasModelFactory extends IOnChainGasModelFactory {
     // Some tokens have extremely expensive transferFrom functions, which causes
     // us to underestimate them by a large amount. For known tokens, we apply an
     // adjustment.
-    const tokenOverhead = TOKEN_OVERHEAD(chainId, routeWithValidQuote.route);
+    // const tokenOverhead = TOKEN_OVERHEAD(chainId, routeWithValidQuote.route);
+    // Not currently a concern for us on Base
+    const tokenOverhead = BigNumber.from(0);
 
     const tickGasUse = COST_PER_INIT_TICK(chainId).mul(totalInitializedTicksCrossed);
     const uninitializedTickGasUse = COST_PER_UNINIT_TICK.mul(0);
