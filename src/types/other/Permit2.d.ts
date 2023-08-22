@@ -2,22 +2,21 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import {
-  ethers,
-  EventFilter,
-  Signer,
-  BigNumber,
-  BigNumberish,
-  PopulatedTransaction,
-  BaseContract,
-  ContractTransaction,
-  Overrides,
-  CallOverrides,
-} from "ethers";
+import { EventFragment, FunctionFragment, Result } from "@ethersproject/abi";
 import { BytesLike } from "@ethersproject/bytes";
 import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
+import {
+  BaseContract,
+  BigNumber,
+  BigNumberish,
+  CallOverrides,
+  ContractTransaction,
+  ethers,
+  Overrides,
+  PopulatedTransaction,
+  Signer,
+} from "ethers";
+import { TypedEvent, TypedEventFilter, TypedListener } from "./commons";
 
 interface Permit2Interface extends ethers.utils.Interface {
   functions: {
@@ -28,9 +27,9 @@ interface Permit2Interface extends ethers.utils.Interface {
     "invalidateUnorderedNonces(uint256,uint256)": FunctionFragment;
     "lockdown(tuple[])": FunctionFragment;
     "nonceBitmap(address,uint256)": FunctionFragment;
-    "permit(address,(tuple[],address,uint256),bytes)": FunctionFragment;
-    "permitTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes)": FunctionFragment;
-    "permitWitnessTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes32,string,bytes)": FunctionFragment;
+    "permit(address,tuple,bytes)": FunctionFragment;
+    "permitTransferFrom(tuple,tuple,address,bytes)": FunctionFragment;
+    "permitWitnessTransferFrom(tuple,tuple,address,bytes32,string,bytes)": FunctionFragment;
     "transferFrom(tuple[])": FunctionFragment;
   };
 
@@ -161,49 +160,6 @@ interface Permit2Interface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Permit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UnorderedNonceInvalidation"): EventFragment;
 }
-
-export type ApprovalEvent = TypedEvent<
-  [string, string, string, BigNumber, number] & {
-    owner: string;
-    token: string;
-    spender: string;
-    amount: BigNumber;
-    expiration: number;
-  }
->;
-
-export type LockdownEvent = TypedEvent<
-  [string, string, string] & { owner: string; token: string; spender: string }
->;
-
-export type NonceInvalidationEvent = TypedEvent<
-  [string, string, string, number, number] & {
-    owner: string;
-    token: string;
-    spender: string;
-    newNonce: number;
-    oldNonce: number;
-  }
->;
-
-export type PermitEvent = TypedEvent<
-  [string, string, string, BigNumber, number, number] & {
-    owner: string;
-    token: string;
-    spender: string;
-    amount: BigNumber;
-    expiration: number;
-    nonce: number;
-  }
->;
-
-export type UnorderedNonceInvalidationEvent = TypedEvent<
-  [string, BigNumber, BigNumber] & {
-    owner: string;
-    word: BigNumber;
-    mask: BigNumber;
-  }
->;
 
 export class Permit2 extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -700,23 +656,6 @@ export class Permit2 extends BaseContract {
   };
 
   filters: {
-    "Approval(address,address,address,uint160,uint48)"(
-      owner?: string | null,
-      token?: string | null,
-      spender?: string | null,
-      amount?: null,
-      expiration?: null
-    ): TypedEventFilter<
-      [string, string, string, BigNumber, number],
-      {
-        owner: string;
-        token: string;
-        spender: string;
-        amount: BigNumber;
-        expiration: number;
-      }
-    >;
-
     Approval(
       owner?: string | null,
       token?: string | null,
@@ -734,15 +673,6 @@ export class Permit2 extends BaseContract {
       }
     >;
 
-    "Lockdown(address,address,address)"(
-      owner?: string | null,
-      token?: null,
-      spender?: null
-    ): TypedEventFilter<
-      [string, string, string],
-      { owner: string; token: string; spender: string }
-    >;
-
     Lockdown(
       owner?: string | null,
       token?: null,
@@ -750,23 +680,6 @@ export class Permit2 extends BaseContract {
     ): TypedEventFilter<
       [string, string, string],
       { owner: string; token: string; spender: string }
-    >;
-
-    "NonceInvalidation(address,address,address,uint48,uint48)"(
-      owner?: string | null,
-      token?: string | null,
-      spender?: string | null,
-      newNonce?: null,
-      oldNonce?: null
-    ): TypedEventFilter<
-      [string, string, string, number, number],
-      {
-        owner: string;
-        token: string;
-        spender: string;
-        newNonce: number;
-        oldNonce: number;
-      }
     >;
 
     NonceInvalidation(
@@ -783,25 +696,6 @@ export class Permit2 extends BaseContract {
         spender: string;
         newNonce: number;
         oldNonce: number;
-      }
-    >;
-
-    "Permit(address,address,address,uint160,uint48,uint48)"(
-      owner?: string | null,
-      token?: string | null,
-      spender?: string | null,
-      amount?: null,
-      expiration?: null,
-      nonce?: null
-    ): TypedEventFilter<
-      [string, string, string, BigNumber, number, number],
-      {
-        owner: string;
-        token: string;
-        spender: string;
-        amount: BigNumber;
-        expiration: number;
-        nonce: number;
       }
     >;
 
@@ -822,15 +716,6 @@ export class Permit2 extends BaseContract {
         expiration: number;
         nonce: number;
       }
-    >;
-
-    "UnorderedNonceInvalidation(address,uint256,uint256)"(
-      owner?: string | null,
-      word?: null,
-      mask?: null
-    ): TypedEventFilter<
-      [string, BigNumber, BigNumber],
-      { owner: string; word: BigNumber; mask: BigNumber }
     >;
 
     UnorderedNonceInvalidation(
