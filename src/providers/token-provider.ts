@@ -59,7 +59,13 @@ export const USDC_BASE_GOERLI = new Token(
   'USD Base Coin'
 );
 
-const DAI_BASE = new Token(ChainId.BASE, '0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb', 18, 'DAI', 'DAI Stablecoin');
+export const DAI_BASE = new Token(
+  ChainId.BASE,
+  '0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb',
+  18,
+  'DAI',
+  'DAI Stablecoin'
+);
 
 export class TokenProvider implements ITokenProvider {
   constructor(private chainId: ChainId, protected multicall2Provider: IMulticallProvider) {}
@@ -135,7 +141,7 @@ export class TokenProvider implements ITokenProvider {
     const symbolToToken: { [symbol: string]: Token } = {};
 
     const addresses = _(_addresses)
-      .map(address => address.toLowerCase())
+      .map((address) => address.toLowerCase())
       .uniq()
       .value();
 
