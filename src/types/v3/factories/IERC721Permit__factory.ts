@@ -2,8 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer, utils } from "ethers";
 import { Provider } from "@ethersproject/providers";
+import { Contract, Signer, utils } from "ethers";
 import type { IERC721Permit, IERC721PermitInterface } from "../IERC721Permit";
 
 const _abi = [

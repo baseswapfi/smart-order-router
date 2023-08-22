@@ -1,5 +1,6 @@
 import { Protocol } from '@baseswapfi/router-sdk';
-import { Percent, Pool } from '@baseswapfi/sdk-core';
+import { Percent } from '@baseswapfi/sdk-core';
+import { Pool } from '@baseswapfi/v3-sdk2';
 import { Pair } from '@baseswapfi/v2-sdk';
 import _ from 'lodash';
 import { V3_CORE_FACTORY_ADDRESSES } from './addresses';

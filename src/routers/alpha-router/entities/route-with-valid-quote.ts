@@ -1,6 +1,7 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { Protocol } from '@baseswapfi/router-sdk';
-import { Pool, Token, TradeType } from '@baseswapfi/sdk-core';
+import { Token, TradeType } from '@baseswapfi/sdk-core';
+import { Pool } from '@baseswapfi/v3-sdk2';
 import _ from 'lodash';
 import { CurrencyAmount } from '../../../util/amounts';
 

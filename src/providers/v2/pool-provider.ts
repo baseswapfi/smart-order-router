@@ -1,4 +1,5 @@
-import { FeeAmount, Pool, Token } from '@baseswapfi/sdk-core';
+import { Token } from '@baseswapfi/sdk-core';
+import { FeeAmount, Pool } from '@baseswapfi/v3-sdk2';
 import { Pair } from '@baseswapfi/v2-sdk';
 
 import { ProviderConfig } from '../provider';

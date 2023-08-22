@@ -55,11 +55,7 @@ export enum NativeCurrencyName {
 }
 
 export const NATIVE_NAMES_BY_ID: { [chainId: number]: string[] } = {
-  [ChainId.BASE]: [
-    'ETH',
-    'ETHER',
-    '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
-  ],
+  [ChainId.BASE]: ['ETH', 'ETHER', '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'],
 };
 
 export const NATIVE_CURRENCY: { [chainId: number]: NativeCurrencyName } = {
@@ -77,9 +73,7 @@ export const ID_TO_NETWORK_NAME = (id: number): ChainName => {
   }
 };
 
-export const CHAIN_IDS_LIST = Object.values(ChainId).map(c =>
-  c.toString()
-) as string[];
+export const CHAIN_IDS_LIST = Object.values(ChainId).map(c => c.toString()) as string[];
 
 export const ID_TO_PROVIDER = (id: ChainId): string => {
   switch (id) {
@@ -91,15 +85,16 @@ export const ID_TO_PROVIDER = (id: ChainId): string => {
 };
 
 export const WRAPPED_NATIVE_CURRENCY: { [chainId in ChainId]: Token } = {
-  [ChainId.BASE]: new Token(
-    ChainId.BASE,
+  [ChainId.BASE]: new Token(ChainId.BASE, '0x4200000000000000000000000000000000000006', 18, 'WETH', 'Wrapped Ether'),
+  [ChainId.BASE_GOERLI]: new Token(
+    ChainId.BASE_GOERLI,
     '0x4200000000000000000000000000000000000006',
     18,
     'WETH',
     'Wrapped Ether'
   ),
-  [ChainId.BASE_GOERLI]: new Token(
-    ChainId.BASE_GOERLI,
+  [ChainId.OPTIMISM]: new Token(
+    ChainId.OPTIMISM,
     '0x4200000000000000000000000000000000000006',
     18,
     'WETH',
@@ -120,10 +115,7 @@ export class ExtendedEther extends Ether {
   } = {};
 
   public static onChain(chainId: number): ExtendedEther {
-    return (
-      this._cachedExtendedEther[chainId] ??
-      (this._cachedExtendedEther[chainId] = new ExtendedEther(chainId))
-    );
+    return this._cachedExtendedEther[chainId] ?? (this._cachedExtendedEther[chainId] = new ExtendedEther(chainId));
   }
 }
 

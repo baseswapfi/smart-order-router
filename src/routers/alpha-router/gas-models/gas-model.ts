@@ -1,5 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber';
-import { ChainId, Pool, Token } from '@baseswapfi/sdk-core';
+import { ChainId, Token } from '@baseswapfi/sdk-core';
+import { Pool } from '@baseswapfi/v3-sdk2';
 
 import { ProviderConfig } from '../../../providers/provider';
 import { USDC_BASE } from '../../../providers/token-provider';

@@ -2,8 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer, utils } from "ethers";
 import { Provider } from "@ethersproject/providers";
+import { Contract, Signer, utils } from "ethers";
 import type { IV3Migrator, IV3MigratorInterface } from "../IV3Migrator";
 
 const _abi = [
