@@ -1,6 +1,6 @@
 {
   "name": "@baseswapfi/smart-order-router",
-  "version": "3.15.16",
+  "version": "3.15.17",
   "description": "Uniswap Smart Order Router",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
@@ -26,11 +26,11 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@baseswapfi/router-sdk": "^1.0.11",
-    "@baseswapfi/sdk-core": "^1.0.13",
-    "@baseswapfi/universal-router-sdk": "^1.5.18",
-    "@baseswapfi/v2-sdk": "^1.0.8",
-    "@baseswapfi/v3-sdk2": "^3.10.7",
+    "@baseswapfi/router-sdk": "^1.0.12",
+    "@baseswapfi/sdk-core": "^1.0.15",
+    "@baseswapfi/universal-router-sdk": "^1.5.19",
+    "@baseswapfi/v2-sdk": "^1.0.9",
+    "@baseswapfi/v3-sdk2": "^3.10.8",
     "@ethersproject/bignumber": "^5.7.0",
     "@uniswap/default-token-list": "^11.2.0",
     "@uniswap/swap-router-contracts": "1.1.0",
