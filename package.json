@@ -26,11 +26,11 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@baseswapfi/router-sdk": "^1.0.8",
+    "@baseswapfi/router-sdk": "^1.0.11",
     "@baseswapfi/sdk-core": "^1.0.13",
-    "@baseswapfi/universal-router-sdk": "^1.5.15",
-    "@baseswapfi/v2-sdk": "^1.0.7",
-    "@baseswapfi/v3-sdk2": "^3.10.5",
+    "@baseswapfi/universal-router-sdk": "^1.5.18",
+    "@baseswapfi/v2-sdk": "^1.0.8",
+    "@baseswapfi/v3-sdk2": "^3.10.7",
     "@ethersproject/bignumber": "^5.7.0",
     "@uniswap/default-token-list": "^11.2.0",
     "@uniswap/swap-router-contracts": "1.1.0",
