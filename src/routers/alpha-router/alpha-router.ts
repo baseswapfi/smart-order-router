@@ -1,6 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { BaseProvider, JsonRpcProvider } from '@ethersproject/providers';
-import DEFAULT_TOKEN_LIST from '@uniswap/default-token-list';
+import DEFAULT_TOKEN_LIST from '../../baseswap-default.tokenlist.json';
 import { Protocol, SwapRouter, Trade } from '@baseswapfi/router-sdk';
 import { ChainId, Currency, Fraction, Token, TradeType } from '@baseswapfi/sdk-core';
 import { TokenList } from '@uniswap/token-lists';
