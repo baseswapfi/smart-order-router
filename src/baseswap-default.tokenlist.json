@@ -10,7 +10,6 @@
   "logoURI": "https://pancakeswap.finance/logo.png",
   "keywords": ["baseswap", "default"],
   "tokens": [
-
     {
       "name": "BaseSwap Token",
       "symbol": "BSWAP",
@@ -29,8 +28,16 @@
     },
     {
       "name": "USD Base Coin",
-      "symbol": "USDC",
+      "symbol": "USDbC",
       "address": "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA",
+      "chainId": 8453,
+      "decimals": 6,
+      "logoURI": "https://baseswap.fi/images/tokens/0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA.png"
+    },
+    {
+      "name": "USD Coin",
+      "symbol": "USDC",
+      "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
       "chainId": 8453,
       "decimals": 6,
       "logoURI": "https://baseswap.fi/images/tokens/0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA.png"
@@ -68,6 +75,23 @@
       "logoURI": ""
     },
     {
+      "name": "GMD Protocol",
+      "symbol": "GMD",
+      "address": "0xcd239e01c36d3079c0daef355c61cff591c40db1",
+      "chainId": 8453,
+      "decimals": 18,
+      "logoURI": ""
+    },
+    {
+      "name": "GND Protocol",
+      "symbol": "GND",
+      "address": "0xfb825e93822dd971ebdfdb2180a751958dbd5e16",
+      "chainId": 8453,
+      "decimals": 18,
+      "logoURI": ""
+    },
+
+    {
       "name": "Axelar Wrapped Bitcoin",
       "symbol": "axlWBTC",
       "address": "0x1a35EE4640b0A3B87705B0A4B45D227Ba60Ca2ad",
@@ -75,14 +99,7 @@
       "decimals": 8,
       "logoURI": ""
     },
-    {
-      "name": "Magnate Finance",
-      "symbol": "MAG",
-      "address": "0x2DC1cDa9186a4993bD36dE60D08787c0C382BEAD",
-      "chainId": 8453,
-      "decimals": 18,
-      "logoURI": ""
-    },
+
     {
       "name": "BlazeBot",
       "symbol": "BLAZE",
@@ -156,34 +173,10 @@
       "logoURI": "https://pancakeswap.finance/images/tokens/0x2170Ed0880ac9A755fd29B2688956BD959F933F8.png"
     },
     {
-      "name": "BaseSwap Token",
-      "symbol": "BSWAP",
-      "address": "0xe32301c82dc9ADC350eaC08eED03cE1c6FEDeB92",
-      "chainId": 84531,
-      "decimals": 18,
-      "logoURI": "/images/tokens/baseswap_logo.png"
-    },
-    {
-      "name": "Wrapped Ether",
-      "symbol": "WETH",
-      "address": "0x4200000000000000000000000000000000000006",
-      "chainId": 84531,
-      "decimals": 18,
-      "logoURI": "https://pancakeswap.finance/images/tokens/0x2170Ed0880ac9A755fd29B2688956BD959F933F8.png"
-    },
-    {
-      "name": "Big Booby Things",
-      "symbol": "BBT",
-      "address": "0x2ee99Be3c520B7Bd64f51641c3e7Ef28950E03B7",
-      "chainId": 84531,
-      "decimals": 18,
-      "logoURI": ""
-    },
-    {
-      "name": "Ogre",
-      "symbol": "OGRE",
-      "address": "0xFe6028c5142fE9854A846DF7451e8600a15CA710",
-      "chainId": 84531,
+      "name": "MAI Stablecoin ",
+      "symbol": "MAI",
+      "address": "0xbf1aeA8670D2528E08334083616dD9C5F3B087aE",
+      "chainId": 8453,
       "decimals": 18,
       "logoURI": ""
     },
