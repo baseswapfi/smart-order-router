@@ -32,15 +32,7 @@
       "address": "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA",
       "chainId": 8453,
       "decimals": 6,
-      "logoURI": "https://baseswap.fi/images/tokens/0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA.png"
-    },
-    {
-      "name": "USD Coin",
-      "symbol": "USDC",
-      "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-      "chainId": 8453,
-      "decimals": 6,
-      "logoURI": "https://baseswap.fi/images/tokens/0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA.png"
+      "logoURI": ""
     },
     {
       "name": "DAI Stablecoin Token",
@@ -173,6 +165,30 @@
       "logoURI": "https://pancakeswap.finance/images/tokens/0x2170Ed0880ac9A755fd29B2688956BD959F933F8.png"
     },
     {
+      "name": "Arbidex",
+      "symbol": "ARX",
+      "address": "0x58Ed4FD0C3d930b674BA50a293f03ef6cD7dE7a3",
+      "chainId": 8453,
+      "decimals": 18,
+      "logoURI": "https://baseswap.fi/images/tokens/0x58Ed4FD0C3d930b674BA50a293f03ef6cD7dE7a3.png"
+    },
+    {
+      "name": "USDC Stablecoin",
+      "symbol": "USDC",
+      "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "chainId": 8453,
+      "decimals": 6,
+      "logoURI": "https://baseswap.fi/images/tokens/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913.png"
+    },
+    {
+      "name": "DOLA USD Stablecoin",
+      "symbol": "DOLA",
+      "address": "0x4621b7A9c75199271F773Ebd9A499dbd165c3191",
+      "chainId": 8453,
+      "decimals": 6,
+      "logoURI": "18"
+    },
+    {
       "name": "MAI Stablecoin ",
       "symbol": "MAI",
       "address": "0xbf1aeA8670D2528E08334083616dD9C5F3B087aE",
@@ -181,11 +197,11 @@
       "logoURI": ""
     },
     {
-      "name": "axlUSDC",
-      "symbol": "axlUSDC",
-      "address": "0xEd2D3fA2102980EeBdF2B12E58c1a96c9889315F",
-      "chainId": 84531,
-      "decimals": 6,
+      "name": "BullRun",
+      "symbol": "BULLRUN",
+      "address": "0x1A9132ee02d7E98e51b7389D2e7BB537184867Aa",
+      "chainId": 8453,
+      "decimals": 18,
       "logoURI": ""
     }
   ]

@@ -53,7 +53,7 @@ import {
   OptimismGasDataProvider,
 } from '../../providers/v3/gas-data-provider';
 import { IV3PoolProvider, V3PoolProvider } from '../../providers/v3/pool-provider';
-import { IV3SubgraphProvider } from '../../providers/v3/subgraph-provider';
+import { IV3SubgraphProvider, V3SubgraphProvider } from '../../providers/v3/subgraph-provider';
 import { Erc20__factory } from '../../types/other/factories/Erc20__factory';
 import { SWAP_ROUTER_02_ADDRESSES, WRAPPED_NATIVE_CURRENCY } from '../../util';
 import { CurrencyAmount } from '../../util/amounts';
@@ -464,32 +464,6 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
             }
           );
           break;
-        // case ChainId.ARBITRUM_ONE:
-        // case ChainId.ARBITRUM_GOERLI:
-        //   this.onChainQuoteProvider = new OnChainQuoteProvider(
-        //     chainId,
-        //     provider,
-        //     this.multicall2Provider,
-        //     {
-        //       retries: 2,
-        //       minTimeout: 100,
-        //       maxTimeout: 1000,
-        //     },
-        //     {
-        //       multicallChunk: 10,
-        //       gasLimitPerCall: 12_000_000,
-        //       quoteMinSuccessRate: 0.1,
-        //     },
-        //     {
-        //       gasLimitOverride: 30_000_000,
-        //       multicallChunk: 6,
-        //     },
-        //     {
-        //       gasLimitOverride: 30_000_000,
-        //       multicallChunk: 6,
-        //     }
-        //   );
-        //   break;
         default:
           this.onChainQuoteProvider = new OnChainQuoteProvider(
             chainId,
@@ -568,19 +542,21 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     if (v3SubgraphProvider) {
       this.v3SubgraphProvider = v3SubgraphProvider;
     } else {
-      this.v3SubgraphProvider = new V3SubgraphProviderWithFallBacks([
-        new CachingV3SubgraphProvider(
-          chainId,
-          new URISubgraphProvider(
-            chainId,
-            `https://cloudflare-ipfs.com/ipns/api.uniswap.org/v1/pools/v3/${chainName}.json`,
-            undefined,
-            0
-          ),
-          new NodeJSCache(new NodeCache({ stdTTL: 300, useClones: false }))
-        ),
-        new StaticV3SubgraphProvider(chainId, this.v3PoolProvider),
-      ]);
+      // this.v3SubgraphProvider = new V3SubgraphProviderWithFallBacks([
+      //   new CachingV3SubgraphProvider(
+      //     chainId,
+      //     new URISubgraphProvider(
+      //       chainId,
+      //       `https://cloudflare-ipfs.com/ipns/api.uniswap.org/v1/pools/v3/${chainName}.json`,
+      //       undefined,
+      //       0
+      //     ),
+      //     new NodeJSCache(new NodeCache({ stdTTL: 300, useClones: false }))
+      //   ),
+      //   new StaticV3SubgraphProvider(chainId, this.v3PoolProvider),
+      // ]);
+      // Overrides Uni to use our subgraph for the current chain (or throws for invalid chains)
+      this.v3SubgraphProvider = new V3SubgraphProvider(this.chainId);
     }
 
     let gasPriceProviderInstance: IGasPriceProvider;

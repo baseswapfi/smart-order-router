@@ -44,7 +44,6 @@ export const printV2SubgraphPool = (s: V2SubgraphPool) => `${s.token0.id}/${s.to
 
 const SUBGRAPH_URL_BY_CHAIN: { [chainId in ChainId]?: string } = {
   [ChainId.BASE]: 'https://api.thegraph.com/subgraphs/name/baseswapfi/v3-base',
-  // [ChainId.BASE]: 'https://api.thegraph.com/subgraphs/name/harleen-m/basex',
 };
 
 const PAGE_SIZE = 1000; // 1k is max possible query size from subgraph.
@@ -165,8 +164,8 @@ export class V3SubgraphProvider implements IV3SubgraphProvider {
     );
 
     const poolsSanitized = pools
-      .filter(pool => parseInt(pool.liquidity) > 0 || parseFloat(pool.totalValueLockedETH) > 0.01)
-      .map(pool => {
+      .filter((pool) => parseInt(pool.liquidity) > 0 || parseFloat(pool.totalValueLockedETH) > 0.01)
+      .map((pool) => {
         const { totalValueLockedETH, totalValueLockedUSD, ...rest } = pool;
 
         return {

@@ -18,11 +18,12 @@ export const QUOTER_V2_ADDRESSES: AddressMap = {
   [ChainId.BASE]: CHAIN_TO_ADDRESSES_MAP[ChainId.BASE].quoterAddress,
 };
 
+// TODO: Checkout the mixed routing thing. Relevant for our setup now
 export const MIXED_ROUTE_QUOTER_V1_ADDRESSES: AddressMap = {};
 
 export const UNISWAP_MULTICALL_ADDRESSES: AddressMap = {
   [ChainId.BASE_GOERLI]: CHAIN_TO_ADDRESSES_MAP[ChainId.BASE_GOERLI].multicallAddress,
-  [ChainId.BASE]: CHAIN_TO_ADDRESSES_MAP[ChainId.BASE].multicallAddress,
+  [ChainId.BASE]: CHAIN_TO_ADDRESSES_MAP[ChainId.BASE].multicallAddress, // Needs to be the Uni version
 };
 
 export const SWAP_ROUTER_02_ADDRESSES = (chainId: number): string => {
