@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@baseswapfi/router-sdk": "^1.0.20",
-    "@baseswapfi/sdk-core": "^1.0.25",
+    "@baseswapfi/sdk-core": "^1.0.23",
     "@baseswapfi/universal-router-sdk": "^1.5.28",
     "@baseswapfi/v2-sdk": "^1.0.16",
     "@baseswapfi/v3-sdk2": "^3.10.16",
