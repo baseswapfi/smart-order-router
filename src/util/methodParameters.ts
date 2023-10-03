@@ -1,6 +1,6 @@
 import { MixedRouteSDK, Protocol, SwapRouter as SwapRouter02, Trade } from '@baseswapfi/router-sdk';
 import { ChainId, Currency, TradeType } from '@baseswapfi/sdk-core';
-// import { SwapRouter as UniveralRouter, UNIVERSAL_ROUTER_ADDRESS } from '@baseswapfi/universal-router-sdk';
+import { SwapRouter as UniveralRouter, UNIVERSAL_ROUTER_ADDRESS } from '@baseswapfi/universal-router-sdk';
 import { Route as V2RouteRaw } from '@baseswapfi/v2-sdk';
 import { Route as V3RouteRaw } from '@baseswapfi/v3-sdk2';
 import _ from 'lodash';
@@ -154,10 +154,10 @@ export function buildSwapMethodParameters(
   chainId: ChainId
 ): MethodParameters {
   if (swapConfig.type == SwapType.UNIVERSAL_ROUTER) {
-    // return {
-    //   ...UniveralRouter.swapERC20CallParameters(trade, swapConfig),
-    //   to: UNIVERSAL_ROUTER_ADDRESS(chainId),
-    // };
+    return {
+      ...UniveralRouter.swapERC20CallParameters(trade, swapConfig),
+      to: UNIVERSAL_ROUTER_ADDRESS(chainId),
+    };
   } else if (swapConfig.type == SwapType.SWAP_ROUTER_02) {
     const { recipient, slippageTolerance, deadline, inputTokenPermit } = swapConfig;
 
