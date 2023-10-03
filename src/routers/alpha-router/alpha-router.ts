@@ -18,7 +18,7 @@ import {
   CachingV2PoolProvider,
   CachingV2SubgraphProvider,
   CachingV3PoolProvider,
-  // CachingV3SubgraphProvider,
+  CachingV3SubgraphProvider,
   EIP1559GasPriceProvider,
   ETHGasStationInfoProvider,
   IOnChainQuoteProvider,
@@ -556,7 +556,11 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
       //   new StaticV3SubgraphProvider(chainId, this.v3PoolProvider),
       // ]);
       // Overrides Uni to use our subgraph for the current chain (or throws for invalid chains)
-      this.v3SubgraphProvider = new V3SubgraphProvider(this.chainId);
+      this.v3SubgraphProvider = new CachingV3SubgraphProvider(
+        this.chainId,
+        new V3SubgraphProvider(this.chainId),
+        new NodeJSCache(new NodeCache({ stdTTL: 300, useClones: false }))
+      );
     }
 
     let gasPriceProviderInstance: IGasPriceProvider;
@@ -583,7 +587,7 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
 
     this.swapRouterProvider = swapRouterProvider ?? new SwapRouterProvider(this.multicall2Provider, this.chainId);
 
-    if (chainId === ChainId.OPTIMISM || chainId === ChainId.BASE) {
+    if (chainId === ChainId.OPTIMISM || chainId === ChainId.BASE || chainId === ChainId.BASE_GOERLI) {
       this.l2GasDataProvider = optimismGasDataProvider ?? new OptimismGasDataProvider(chainId, this.multicall2Provider);
     }
     // if (chainId === ChainId.ARBITRUM_ONE || chainId === ChainId.ARBITRUM_GOERLI) {
