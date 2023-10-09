@@ -1,6 +1,6 @@
 {
   "name": "@baseswapfi/smart-order-router",
-  "version": "3.15.30",
+  "version": "3.15.31",
   "description": "Uniswap Smart Order Router",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
@@ -26,10 +26,10 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@baseswapfi/router-sdk": "^1.0.21",
+    "@baseswapfi/router-sdk": "^1.0.23",
     "@baseswapfi/sdk-core": "^1.0.26",
-    "@baseswapfi/universal-router-sdk": "^1.5.29",
-    "@baseswapfi/v2-sdk": "^1.0.16",
+    "@baseswapfi/universal-router-sdk": "^1.5.31",
+    "@baseswapfi/v2-sdk": "^1.0.17",
     "@baseswapfi/v3-sdk2": "^3.10.17",
     "@ethersproject/bignumber": "^5.7.0",
     "@uniswap/default-token-list": "^11.2.0",
@@ -55,11 +55,12 @@
   "devDependencies": {
     "@size-limit/preset-small-lib": "^8.2.6",
     "@typechain/ethers-v5": "^7.0.1",
-    "@types/async-retry": "^1.4.4",
+    "@types/async-retry": "^1.3.1",
     "@types/await-timeout": "^0.3.1",
     "@types/bunyan": "^1.8.6",
     "@types/bunyan-blackhole": "^0.2.2",
     "@types/lodash": "^4.14.168",
+    "@types/node": "^16.15.0",
     "@types/stats-lite": "^2.2.0",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
