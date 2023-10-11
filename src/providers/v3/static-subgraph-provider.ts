@@ -21,6 +21,7 @@ const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
   [ChainId.OPTIMISM]: [WRAPPED_NATIVE_CURRENCY[ChainId.OPTIMISM]!, USDC_OPTIMISM],
   [ChainId.BASE_GOERLI]: [WRAPPED_NATIVE_CURRENCY[ChainId.BASE_GOERLI]],
   [ChainId.BASE]: [WRAPPED_NATIVE_CURRENCY[ChainId.BASE], USDC_BASE],
+  [ChainId.SCROLL_SEPOLIA]: [WRAPPED_NATIVE_CURRENCY[ChainId.SCROLL_SEPOLIA]],
 };
 
 /**
@@ -42,7 +43,7 @@ export class StaticV3SubgraphProvider implements IV3SubgraphProvider {
     const bases = BASES_TO_CHECK_TRADES_AGAINST[this.chainId];
 
     const basePairs: [Token, Token][] = _.flatMap(bases, (base): [Token, Token][] =>
-      bases.map(otherBase => [base, otherBase])
+      bases.map((otherBase) => [base, otherBase])
     );
 
     if (tokenIn && tokenOut) {
@@ -72,7 +73,7 @@ export class StaticV3SubgraphProvider implements IV3SubgraphProvider {
 
     const poolAddressSet = new Set<string>();
     const subgraphPools: V3SubgraphPool[] = _(pools)
-      .map(pool => {
+      .map((pool) => {
         const { token0, token1, fee, liquidity } = pool;
 
         const poolAddress = Pool.getAddress(pool.token0, pool.token1, pool.fee);
