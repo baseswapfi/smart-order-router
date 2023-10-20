@@ -31,13 +31,14 @@ import {
   OnChainGasPriceProvider,
   OnChainQuoteProvider,
   Simulator,
-  StaticV2SubgraphProvider,
+  // StaticV2SubgraphProvider,
   // StaticV3SubgraphProvider,
   SwapRouterProvider,
   UniswapMulticallProvider,
-  URISubgraphProvider,
+  // URISubgraphProvider,
   V2QuoteProvider,
-  V2SubgraphProviderWithFallBacks,
+  V2SubgraphProvider,
+  // V2SubgraphProviderWithFallBacks,
   // V3SubgraphProviderWithFallBacks,
 } from '../../providers';
 import { CachingTokenListProvider, ITokenListProvider } from '../../providers/caching-token-list-provider';
@@ -57,7 +58,7 @@ import { IV3SubgraphProvider, V3SubgraphProvider } from '../../providers/v3/subg
 import { Erc20__factory } from '../../types/other/factories/Erc20__factory';
 import { SWAP_ROUTER_02_ADDRESSES, WRAPPED_NATIVE_CURRENCY } from '../../util';
 import { CurrencyAmount } from '../../util/amounts';
-import { ID_TO_CHAIN_ID, ID_TO_NETWORK_NAME, V2_SUPPORTED } from '../../util/chains';
+import { ID_TO_CHAIN_ID, V2_SUPPORTED } from '../../util/chains';
 import { getHighestLiquidityV3NativePool, getHighestLiquidityV3USDPool } from '../../util/gas-factory-helpers';
 import { log } from '../../util/log';
 import { buildSwapMethodParameters, buildTrade } from '../../util/methodParameters';
@@ -518,25 +519,32 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
         new TokenProvider(chainId, this.multicall2Provider)
       );
 
-    const chainName = ID_TO_NETWORK_NAME(chainId);
+    // const chainName = ID_TO_NETWORK_NAME(chainId);
 
     // ipfs urls in the following format: `https://cloudflare-ipfs.com/ipns/api.uniswap.org/v1/pools/${protocol}/${chainName}.json`;
     if (v2SubgraphProvider) {
       this.v2SubgraphProvider = v2SubgraphProvider;
     } else {
-      this.v2SubgraphProvider = new V2SubgraphProviderWithFallBacks([
-        new CachingV2SubgraphProvider(
-          chainId,
-          new URISubgraphProvider(
-            chainId,
-            `https://cloudflare-ipfs.com/ipns/api.uniswap.org/v1/pools/v2/${chainName}.json`, // TODO: If we needed to use V2
-            undefined,
-            0
-          ),
-          new NodeJSCache(new NodeCache({ stdTTL: 300, useClones: false }))
-        ),
-        new StaticV2SubgraphProvider(chainId),
-      ]);
+      // this.v2SubgraphProvider = new V2SubgraphProviderWithFallBacks([
+      //   new CachingV2SubgraphProvider(
+      //     chainId,
+      //     new URISubgraphProvider(
+      //       chainId,
+      //       `https://cloudflare-ipfs.com/ipns/api.uniswap.org/v1/pools/v2/${chainName}.json`, // TODO: If we needed to use V2
+      //       undefined,
+      //       0
+      //     ),
+      //     new NodeJSCache(new NodeCache({ stdTTL: 300, useClones: false }))
+      //   ),
+      //   new StaticV2SubgraphProvider(chainId),
+      // ]);
+
+      // Overrides Uni to use our subgraph for the current chain (or throws for invalid chains)
+      this.v2SubgraphProvider = new CachingV2SubgraphProvider(
+        this.chainId,
+        new V2SubgraphProvider(this.chainId),
+        new NodeJSCache(new NodeCache({ stdTTL: 300, useClones: false }))
+      );
     }
 
     if (v3SubgraphProvider) {

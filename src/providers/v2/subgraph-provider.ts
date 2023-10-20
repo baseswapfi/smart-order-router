@@ -35,7 +35,7 @@ type RawV2SubgraphPool = {
   reserveUSD: string;
 };
 
-const SUBGRAPH_URL_BY_CHAIN: { [chainId in ChainId]?: string } = {
+const V2_SUBGRAPH_URL_BY_CHAIN: { [chainId in ChainId]?: string } = {
   [ChainId.BASE]: 'https://api.thegraph.com/subgraphs/name/harleen-m/baseswap',
 };
 
@@ -63,7 +63,7 @@ export class V2SubgraphProvider implements IV2SubgraphProvider {
     private rollback = true,
     private pageSize = PAGE_SIZE
   ) {
-    const subgraphUrl = SUBGRAPH_URL_BY_CHAIN[this.chainId];
+    const subgraphUrl = V2_SUBGRAPH_URL_BY_CHAIN[this.chainId];
     if (!subgraphUrl) {
       throw new Error(`No subgraph url for chain id: ${this.chainId}`);
     }
@@ -176,10 +176,10 @@ export class V2SubgraphProvider implements IV2SubgraphProvider {
     const FEI = '0x956f47f50a910163d8bf957cf5846d573e7f87ca';
 
     const poolsSanitized: V2SubgraphPool[] = pools
-      .filter(pool => {
+      .filter((pool) => {
         return pool.token0.id == FEI || pool.token1.id == FEI || parseFloat(pool.trackedReserveETH) > threshold;
       })
-      .map(pool => {
+      .map((pool) => {
         return {
           ...pool,
           id: pool.id.toLowerCase(),
