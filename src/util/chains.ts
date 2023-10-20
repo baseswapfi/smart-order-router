@@ -1,16 +1,10 @@
-import {
-  ChainId,
-  // Currency,
-  Ether,
-  NativeCurrency,
-  Token,
-} from '@baseswapfi/sdk-core';
+import { ChainId, Ether, NativeCurrency, Token } from '@baseswapfi/sdk-core';
 
-export const SUPPORTED_CHAINS: ChainId[] = [ChainId.BASE];
+export const SUPPORTED_CHAINS: ChainId[] = [ChainId.BASE, ChainId.SCROLL];
 
-export const V2_SUPPORTED = [ChainId.BASE];
+export const V2_SUPPORTED = [ChainId.BASE, ChainId.SCROLL];
 
-export const HAS_L1_FEE = [ChainId.BASE, ChainId.BASE_GOERLI];
+export const HAS_L1_FEE = [ChainId.BASE, ChainId.BASE_GOERLI, ChainId.SCROLL];
 
 export const ID_TO_CHAIN_ID = (id: number): ChainId => {
   switch (id) {
@@ -18,6 +12,10 @@ export const ID_TO_CHAIN_ID = (id: number): ChainId => {
       return ChainId.BASE;
     case 84531:
       return ChainId.BASE_GOERLI;
+    case 534352:
+      return ChainId.SCROLL;
+    case 534351:
+      return ChainId.SCROLL_SEPOLIA;
     default:
       throw new Error(`Unknown chain id: ${id}`);
   }
@@ -41,6 +39,8 @@ export enum ChainName {
   AVALANCHE = 'avalanche-mainnet',
   BASE = 'base-mainnet',
   BASE_GOERLI = 'base-goerli',
+  SCROLL = 'scroll',
+  SCROLL_SEPOLIA = 'scroll-sepolia',
 }
 
 export enum NativeCurrencyName {
@@ -56,10 +56,12 @@ export enum NativeCurrencyName {
 
 export const NATIVE_NAMES_BY_ID: { [chainId: number]: string[] } = {
   [ChainId.BASE]: ['ETH', 'ETHER', '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'],
+  [ChainId.SCROLL]: ['ETH', 'ETHER', '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'],
 };
 
 export const NATIVE_CURRENCY: { [chainId: number]: NativeCurrencyName } = {
   [ChainId.BASE]: NativeCurrencyName.ETHER,
+  [ChainId.SCROLL]: NativeCurrencyName.ETHER,
 };
 
 export const ID_TO_NETWORK_NAME = (id: number): ChainName => {
@@ -68,6 +70,10 @@ export const ID_TO_NETWORK_NAME = (id: number): ChainName => {
       return ChainName.BASE;
     case 84531:
       return ChainName.BASE_GOERLI;
+    case 534352:
+      return ChainName.SCROLL;
+    case 534351:
+      return ChainName.SCROLL_SEPOLIA;
     default:
       throw new Error(`Unknown chain id: ${id}`);
   }
@@ -103,6 +109,13 @@ export const WRAPPED_NATIVE_CURRENCY: { [chainId in ChainId]: Token } = {
   [ChainId.OPTIMISM]: new Token(
     ChainId.OPTIMISM,
     '0x4200000000000000000000000000000000000006',
+    18,
+    'WETH',
+    'Wrapped Ether'
+  ),
+  [ChainId.SCROLL]: new Token(
+    ChainId.SCROLL,
+    '0x5300000000000000000000000000000000000004',
     18,
     'WETH',
     'Wrapped Ether'
