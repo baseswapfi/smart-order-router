@@ -432,7 +432,7 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
           );
           break;
         case ChainId.BASE:
-        case ChainId.BASE_GOERLI:
+        case ChainId.BASE_GOERLI: // TODO: Scroll?
           this.onChainQuoteProvider = new OnChainQuoteProvider(
             chainId,
             provider,
@@ -595,6 +595,7 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
 
     this.swapRouterProvider = swapRouterProvider ?? new SwapRouterProvider(this.multicall2Provider, this.chainId);
 
+    // TODO: Scroll is L2 but isn't on OP stack. zkEVM setup
     if (chainId === ChainId.OPTIMISM || chainId === ChainId.BASE || chainId === ChainId.BASE_GOERLI) {
       this.l2GasDataProvider = optimismGasDataProvider ?? new OptimismGasDataProvider(chainId, this.multicall2Provider);
     }

@@ -9,6 +9,8 @@ export const DEFAULT_ROUTING_CONFIG_BY_CHAIN = (chainId: ChainId): AlphaRouterCo
     // case ChainId.OPTIMISM_GOERLI:
     case ChainId.BASE:
     case ChainId.BASE_GOERLI:
+    case ChainId.SCROLL:
+    case ChainId.SCROLL_SEPOLIA:
       return {
         v2PoolSelection: {
           topN: 3,

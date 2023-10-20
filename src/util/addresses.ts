@@ -23,8 +23,11 @@ export const UNISWAP_MULTICALL_ADDRESSES: AddressMap = {
   [ChainId.SCROLL]: CHAIN_TO_ADDRESSES_MAP[ChainId.SCROLL].multicallAddress,
 };
 
+// TODO: This is supposed to be the UniversalRouter now?
 export const SWAP_ROUTER_02_ADDRESSES = (chainId: number): string => {
-  return V2_ROUTER_ADDRESSES[chainId] || '';
+  // return V2_ROUTER_ADDRESSES[chainId] || '';
+  console.log(`SWAP_ROUTER_02_ADDRESSES call for chain id: ${chainId}`);
+  return '';
 };
 
 export const OVM_GASPRICE_ADDRESS = '0x420000000000000000000000000000000000000F';

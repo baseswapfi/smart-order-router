@@ -7,7 +7,7 @@ export const UNSUPPORTED_TOKENS = {
     patch: 0,
   },
   tags: {},
-  logoURI: 'ipfs://QmNa8mQkrNKp1WEEeGjFezDmDeodkWRevGFN8JCV7b4Xir',
+  logoURI: '',
   keywords: ['uniswap', 'unsupported', 'broken'],
   tokens: [],
 };
