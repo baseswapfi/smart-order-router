@@ -67,6 +67,30 @@ export const DAI_BASE = new Token(
   'DAI Stablecoin'
 );
 
+export const USDC_SCROLL = new Token(
+  ChainId.SCROLL,
+  '0x06eFdBFf2a14a7c8E15944D1F4A48F9F95F663A4',
+  6,
+  'USDC',
+  'USD Coin'
+);
+
+export const DAI_SCROLL = new Token(
+  ChainId.SCROLL,
+  '0xcA77eB3fEFe3725Dc33bccB54eDEFc3D9f764f97',
+  18,
+  'DAI',
+  'DAI Stablecoin'
+);
+
+export const USDT_SCROLL = new Token(
+  ChainId.SCROLL,
+  '0xf55BEC9cafDbE8730f096Aa55dad6D22d44099Df',
+  6,
+  'USDT',
+  'Tether USD'
+);
+
 export class TokenProvider implements ITokenProvider {
   constructor(private chainId: ChainId, protected multicall2Provider: IMulticallProvider) {}
 
@@ -204,6 +228,8 @@ export const DAI_ON = (chainId: ChainId): Token => {
   switch (chainId) {
     case ChainId.BASE:
       return DAI_BASE;
+    case ChainId.SCROLL:
+      return DAI_SCROLL;
     default:
       throw new Error(`Chain id: ${chainId} not supported`);
   }
@@ -211,8 +237,8 @@ export const DAI_ON = (chainId: ChainId): Token => {
 
 export const USDT_ON = (chainId: ChainId): Token => {
   switch (chainId) {
-    // case ChainId.BASE:
-    //   return USDT_BASE;
+    case ChainId.SCROLL:
+      return USDT_SCROLL;
     default:
       throw new Error(`Chain id: ${chainId} not supported`);
   }
@@ -224,6 +250,8 @@ export const USDC_ON = (chainId: ChainId): Token => {
       return USDC_BASE;
     case ChainId.BASE_GOERLI:
       return USDC_BASE_GOERLI;
+    case ChainId.SCROLL:
+      return USDC_SCROLL;
     default:
       throw new Error(`Chain id: ${chainId} not supported`);
   }
