@@ -67,6 +67,14 @@
       "logoURI": ""
     },
     {
+      "name": "Overnight Finance",
+      "symbol": "OVN",
+      "address": "0xA3d1a8DEB97B111454B294E2324EfAD13a9d8396",
+      "chainId": 8453,
+      "decimals": 18,
+      "logoURI": "https://baseswap.fi/images/tokens/0xA3d1a8DEB97B111454B294E2324EfAD13a9d8396.png"
+    },
+    {
       "name": "GMD Protocol",
       "symbol": "GMD",
       "address": "0xcd239e01c36d3079c0daef355c61cff591c40db1",
