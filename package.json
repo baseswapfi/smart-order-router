@@ -28,11 +28,11 @@
     "integ-test": "TS_NODE=true jest test/integ"
   },
   "dependencies": {
-    "@baseswapfi/router-sdk": "^2.0.0",
-    "@baseswapfi/sdk-core": "^2.0.3",
-    "@baseswapfi/universal-router-sdk": "^2.0.0",
-    "@baseswapfi/v2-sdk": "^2.0.0",
-    "@baseswapfi/v3-sdk2": "^4.0.1",
+    "@baseswapfi/router-sdk": "^2.0.1",
+    "@baseswapfi/sdk-core": "^2.0.5",
+    "@baseswapfi/universal-router-sdk": "^2.0.1",
+    "@baseswapfi/v2-sdk": "^2.0.2",
+    "@baseswapfi/v3-sdk2": "^4.0.2",
     "@ethersproject/bignumber": "^5.7.0",
     "@uniswap/default-token-list": "^11.2.0",
     "@uniswap/swap-router-contracts": "1.1.0",
