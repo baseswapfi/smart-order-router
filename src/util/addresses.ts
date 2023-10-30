@@ -1,4 +1,4 @@
-import { CHAIN_TO_ADDRESSES_MAP, ChainId, Token, V2_ROUTER_ADDRESSES } from '@baseswapfi/sdk-core';
+import { CHAIN_TO_ADDRESSES_MAP, ChainId, Token } from '@baseswapfi/sdk-core';
 
 export type AddressMap = { [chainId: number]: string | undefined };
 
