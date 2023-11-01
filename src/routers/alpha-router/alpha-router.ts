@@ -890,6 +890,10 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
       { blockNumber }
     );
 
+    if (routingConfig.debugRouting) {
+      log.warn(`Finalized routing config is ${JSON.stringify(routingConfig)}`);
+    }
+
     const gasPriceWei = await this.getGasPriceWei();
 
     const quoteToken = quoteCurrency.wrapped;
@@ -910,13 +914,9 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     // Then create an Array from the values of that Set.
     const protocols: Protocol[] = Array.from(new Set(routingConfig.protocols).values());
 
-    const cacheMode = await this.routeCachingProvider?.getCacheMode(
-      this.chainId,
-      amount,
-      quoteToken,
-      tradeType,
-      protocols
-    );
+    const cacheMode =
+      routingConfig.overwriteCacheMode ??
+      (await this.routeCachingProvider?.getCacheMode(this.chainId, amount, quoteToken, tradeType, protocols));
 
     // Fetch CachedRoutes
     let cachedRoutes: CachedRoutes | undefined;
@@ -932,7 +932,13 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
       );
     }
 
-    if (cacheMode && cacheMode !== CacheMode.Darkmode && !cachedRoutes) {
+    metric.putMetric(
+      routingConfig.useCachedRoutes ? 'GetQuoteUsingCachedRoutes' : 'GetQuoteNotUsingCachedRoutes',
+      1,
+      MetricLoggerUnit.Count
+    );
+
+    if (cacheMode && routingConfig.useCachedRoutes && cacheMode !== CacheMode.Darkmode && !cachedRoutes) {
       metric.putMetric(`GetCachedRoute_miss_${cacheMode}`, 1, MetricLoggerUnit.Count);
       log.info(
         {
@@ -947,7 +953,7 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
         },
         `GetCachedRoute miss ${cacheMode} for ${this.tokenPairSymbolTradeTypeChainId(tokenIn, tokenOut, tradeType)}`
       );
-    } else if (cachedRoutes) {
+    } else if (cachedRoutes && routingConfig.useCachedRoutes) {
       metric.putMetric(`GetCachedRoute_hit_${cacheMode}`, 1, MetricLoggerUnit.Count);
       log.info(
         {
@@ -1001,8 +1007,10 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     ]);
 
     let swapRouteRaw: BestSwapRoute | null;
+    let hitsCachedRoute = false;
     if (cacheMode === CacheMode.Livemode && swapRouteFromCache) {
       log.info(`CacheMode is ${cacheMode}, and we are using swapRoute from cache`);
+      hitsCachedRoute = true;
       swapRouteRaw = swapRouteFromCache;
     } else {
       log.info(`CacheMode is ${cacheMode}, and we are using materialized swapRoute`);
@@ -1136,6 +1144,8 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
 
             metric.putMetric(`SetCachedRoute_failure`, 1, MetricLoggerUnit.Count);
           });
+      } else {
+        metric.putMetric(`SetCachedRoute_unnecessary`, 1, MetricLoggerUnit.Count);
       }
     }
 
@@ -1163,6 +1173,7 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
       trade,
       methodParameters,
       blockNumber: BigNumber.from(await blockNumber),
+      hitsCachedRoute: hitsCachedRoute,
     };
 
     if (swapConfig && swapConfig.simulate && methodParameters && methodParameters.calldata) {
