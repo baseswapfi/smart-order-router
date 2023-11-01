@@ -31,15 +31,12 @@ import {
   OnChainGasPriceProvider,
   OnChainQuoteProvider,
   Simulator,
-  // StaticV2SubgraphProvider,
-  // StaticV3SubgraphProvider,
   SwapRouterProvider,
   UniswapMulticallProvider,
-  // URISubgraphProvider,
   V2QuoteProvider,
   V2SubgraphProvider,
-  // V2SubgraphProviderWithFallBacks,
-  // V3SubgraphProviderWithFallBacks,
+  TokenPropertiesProvider,
+  ITokenPropertiesProvider,
 } from '../../providers';
 import { CachingTokenListProvider, ITokenListProvider } from '../../providers/caching-token-list-provider';
 import { GasPrice, IGasPriceProvider } from '../../providers/gas-price-provider';
@@ -199,6 +196,11 @@ export type AlphaRouterParams = {
    * A provider for caching the best route given an amount, quoteToken, tradeType
    */
   routeCachingProvider?: IRouteCachingProvider;
+
+  /**
+   * A provider for getting token properties for special tokens like fee-on-transfer tokens.
+   */
+  tokenPropertiesProvider?: ITokenPropertiesProvider;
 };
 
 export class MapWithLowerCaseKey<V> extends Map<string, V> {
@@ -358,6 +360,7 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
   protected v3Quoter: V3Quoter;
   protected mixedQuoter: MixedQuoter;
   protected routeCachingProvider?: IRouteCachingProvider;
+  protected tokenPropertiesProvider?: ITokenPropertiesProvider;
 
   constructor({
     chainId,
@@ -380,6 +383,7 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     tokenValidatorProvider,
     simulator,
     routeCachingProvider,
+    tokenPropertiesProvider,
   }: AlphaRouterParams) {
     this.chainId = chainId;
     this.provider = provider;
@@ -611,6 +615,18 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     //     this.multicall2Provider,
     //     new NodeJSCache(new NodeCache({ stdTTL: 30000, useClones: false }))
     //   );
+    // }
+
+    if (tokenPropertiesProvider) {
+      this.tokenPropertiesProvider = tokenPropertiesProvider;
+    }
+    // else if (this.chainId === ChainId.MAINNET) {
+    //   this.tokenPropertiesProvider = new TokenPropertiesProvider(
+    //     this.chainId,
+    //     this.tokenValidatorProvider!,
+    //     new NodeJSCache(new NodeCache({ stdTTL: 86400, useClones: false })),
+    //     new OnChainTokenFeeFetcher(this.chainId, provider)
+    //   )
     // }
 
     // Initialize the Quoters.

@@ -315,17 +315,19 @@ export const mockTokenList: TokenList = {
 //   'stETH',
 //   false
 // );
-// // stETH is a special case (rebase token), that would make the token include buyFeeBps and sellFeeBps of 0 as always
-// export const STETH = new Token(
-//   ChainId.MAINNET,
-//   '0xae7ab96520de3a18e5e111b5eaab095312d7fe84',
-//   18,
-//   'stETH',
-//   'stETH',
-//   false,
-//   BigNumber.from(0),
-//   BigNumber.from(0)
-// );
+
+// stETH is a special case (rebase token), that would make the token include buyFeeBps and sellFeeBps of 0 as always
+// @note This is CBETH on Base being used here
+export const STETH = new Token(
+  ChainId.BASE,
+  '0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22',
+  18,
+  'cbETH',
+  'cbETH',
+  false,
+  BigNumber.from(0),
+  BigNumber.from(0)
+);
 // export const BITBOY = new Token(
 //   ChainId.MAINNET,
 //   '0x4a500ed6add5994569e66426588168705fcc9767',
@@ -337,15 +339,15 @@ export const mockTokenList: TokenList = {
 //   BigNumber.from(300)
 // );
 
-// export const PORTION_BIPS = 12;
-// export const PORTION_RECIPIENT = '0xd8da6bf26964af9d7eed9e03e53415d37aa96045';
-// export const PORTION_TYPE = 'flat';
+export const PORTION_BIPS = 12;
+export const PORTION_RECIPIENT = '0xd8da6bf26964af9d7eed9e03e53415d37aa96045'; // TODO: ?
+export const PORTION_TYPE = 'flat';
 
-// export type Portion = {
-//   bips: number;
-//   recipient: string;
-//   type: string;
-// };
+export type Portion = {
+  bips: number;
+  recipient: string;
+  type: string;
+};
 
 // export const FLAT_PORTION: Portion = {
 //   bips: PORTION_BIPS,

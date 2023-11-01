@@ -19,34 +19,40 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
-interface IUniswapV3PoolOwnerActionsInterface extends ethers.utils.Interface {
+interface TokenFeeDetectorInterface extends ethers.utils.Interface {
   functions: {
-    "collectProtocol(address,uint128,uint128)": FunctionFragment;
-    "setFeeProtocol(uint8,uint8)": FunctionFragment;
+    "batchValidate(address[],address,uint256)": FunctionFragment;
+    "uniswapV2Call(address,uint256,uint256,bytes)": FunctionFragment;
+    "validate(address,address,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "collectProtocol",
-    values: [string, BigNumberish, BigNumberish]
+    functionFragment: "batchValidate",
+    values: [string[], string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "setFeeProtocol",
-    values: [BigNumberish, BigNumberish]
+    functionFragment: "uniswapV2Call",
+    values: [string, BigNumberish, BigNumberish, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "validate",
+    values: [string, string, BigNumberish]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "collectProtocol",
+    functionFragment: "batchValidate",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setFeeProtocol",
+    functionFragment: "uniswapV2Call",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "validate", data: BytesLike): Result;
 
   events: {};
 }
 
-export class IUniswapV3PoolOwnerActions extends BaseContract {
+export class TokenFeeDetector extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -87,81 +93,131 @@ export class IUniswapV3PoolOwnerActions extends BaseContract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: IUniswapV3PoolOwnerActionsInterface;
+  interface: TokenFeeDetectorInterface;
 
   functions: {
-    collectProtocol(
-      recipient: string,
-      amount0Requested: BigNumberish,
-      amount1Requested: BigNumberish,
+    batchValidate(
+      tokens: string[],
+      baseToken: string,
+      amountToBorrow: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setFeeProtocol(
-      feeProtocol0: BigNumberish,
-      feeProtocol1: BigNumberish,
+    uniswapV2Call(
+      arg0: string,
+      amount0: BigNumberish,
+      arg2: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    validate(
+      token: string,
+      baseToken: string,
+      amountToBorrow: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
-  collectProtocol(
-    recipient: string,
-    amount0Requested: BigNumberish,
-    amount1Requested: BigNumberish,
+  batchValidate(
+    tokens: string[],
+    baseToken: string,
+    amountToBorrow: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setFeeProtocol(
-    feeProtocol0: BigNumberish,
-    feeProtocol1: BigNumberish,
+  uniswapV2Call(
+    arg0: string,
+    amount0: BigNumberish,
+    arg2: BigNumberish,
+    data: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  validate(
+    token: string,
+    baseToken: string,
+    amountToBorrow: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    collectProtocol(
-      recipient: string,
-      amount0Requested: BigNumberish,
-      amount1Requested: BigNumberish,
+    batchValidate(
+      tokens: string[],
+      baseToken: string,
+      amountToBorrow: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber] & { amount0: BigNumber; amount1: BigNumber }
+      ([BigNumber, BigNumber] & {
+        buyFeeBps: BigNumber;
+        sellFeeBps: BigNumber;
+      })[]
     >;
 
-    setFeeProtocol(
-      feeProtocol0: BigNumberish,
-      feeProtocol1: BigNumberish,
+    uniswapV2Call(
+      arg0: string,
+      amount0: BigNumberish,
+      arg2: BigNumberish,
+      data: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    validate(
+      token: string,
+      baseToken: string,
+      amountToBorrow: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber] & { buyFeeBps: BigNumber; sellFeeBps: BigNumber }
+    >;
   };
 
   filters: {};
 
   estimateGas: {
-    collectProtocol(
-      recipient: string,
-      amount0Requested: BigNumberish,
-      amount1Requested: BigNumberish,
+    batchValidate(
+      tokens: string[],
+      baseToken: string,
+      amountToBorrow: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setFeeProtocol(
-      feeProtocol0: BigNumberish,
-      feeProtocol1: BigNumberish,
+    uniswapV2Call(
+      arg0: string,
+      amount0: BigNumberish,
+      arg2: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    validate(
+      token: string,
+      baseToken: string,
+      amountToBorrow: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    collectProtocol(
-      recipient: string,
-      amount0Requested: BigNumberish,
-      amount1Requested: BigNumberish,
+    batchValidate(
+      tokens: string[],
+      baseToken: string,
+      amountToBorrow: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setFeeProtocol(
-      feeProtocol0: BigNumberish,
-      feeProtocol1: BigNumberish,
+    uniswapV2Call(
+      arg0: string,
+      amount0: BigNumberish,
+      arg2: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    validate(
+      token: string,
+      baseToken: string,
+      amountToBorrow: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

@@ -8,7 +8,7 @@ import { ICache } from './cache';
 import { IMulticallProvider } from './multicall-provider';
 import { ProviderConfig } from './provider';
 
-const DEFAULT_ALLOWLIST = new Set<string>([
+export const DEFAULT_ALLOWLIST = new Set<string>([
   // RYOSHI. Does not allow transfers between contracts so fails validation.
   '0x777E2ae845272a2F540ebf6a3D03734A5a8f618e'.toLowerCase(),
 ]);
@@ -64,7 +64,7 @@ export class TokenValidatorProvider implements ITokenValidatorProvider {
   public async validateTokens(tokens: Token[], providerConfig?: ProviderConfig): Promise<TokenValidationResults> {
     const tokenAddressToToken = _.keyBy(tokens, 'address');
     const addressesRaw = _(tokens)
-      .map(token => token.address)
+      .map((token) => token.address)
       .uniq()
       .value();
 
@@ -89,7 +89,7 @@ export class TokenValidatorProvider implements ITokenValidatorProvider {
     );
 
     const functionParams = _(addresses)
-      .map(address => [address, this.BASES, this.amountToFlashBorrow])
+      .map((address) => [address, this.BASES, this.amountToFlashBorrow])
       .value() as [string, string[], string][];
 
     // We use the validate function instead of batchValidate to avoid poison pill problem.
