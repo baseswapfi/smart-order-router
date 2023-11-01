@@ -7,7 +7,7 @@ import _ from 'lodash';
 
 import { IOnChainQuoteProvider, RouteWithQuotes } from '../../providers';
 import { IMulticallProvider } from '../../providers/multicall-provider';
-import { DAI_BASE, ITokenProvider, USDC_BASE } from '../../providers/token-provider';
+import { DAI_BASE, ITokenProvider, USDbC_BASE } from '../../providers/token-provider';
 import { IV3PoolProvider } from '../../providers/v3/pool-provider';
 import { SWAP_ROUTER_02_ADDRESSES } from '../../util';
 import { CurrencyAmount } from '../../util/amounts';
@@ -230,7 +230,7 @@ export class LegacyRouter {
         gasModel: {
           estimateGasCost: () => ({
             gasCostInToken: CurrencyAmount.fromRawAmount(quoteToken, 0),
-            gasCostInUSD: CurrencyAmount.fromRawAmount(USDC_BASE, 0),
+            gasCostInUSD: CurrencyAmount.fromRawAmount(USDbC_BASE, 0),
             gasEstimate: BigNumber.from(0),
           }),
         },

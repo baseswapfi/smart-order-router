@@ -42,13 +42,16 @@ export const USDC_OPTIMISM = new Token(
 );
 
 // Base Tokens
-export const USDC_BASE = new Token(
+export const USDbC_BASE = new Token(
   ChainId.BASE,
   '0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA',
   6,
   'USDbC',
   'USD Base Coin'
 );
+
+// Native
+export const USDC_BASE = new Token(ChainId.BASE, '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', 6, 'USDC', 'USD Coin');
 
 // Base Goerli Tokens
 export const USDC_BASE_GOERLI = new Token(
@@ -247,7 +250,7 @@ export const USDT_ON = (chainId: ChainId): Token => {
 export const USDC_ON = (chainId: ChainId): Token => {
   switch (chainId) {
     case ChainId.BASE:
-      return USDC_BASE;
+      return USDbC_BASE;
     case ChainId.BASE_GOERLI:
       return USDC_BASE_GOERLI;
     case ChainId.SCROLL:

@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import { WRAPPED_NATIVE_CURRENCY } from '../../util/chains';
 import { log } from '../../util/log';
-import { DAI_SCROLL, USDC_BASE, USDC_SCROLL, USDT_SCROLL } from '../token-provider';
+import { DAI_SCROLL, USDbC_BASE, USDC_SCROLL, USDT_SCROLL } from '../token-provider';
 
 import { IV2SubgraphProvider, V2SubgraphPool } from './subgraph-provider';
 
@@ -25,7 +25,7 @@ const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
   // //v2 not deployed on [optimism, arbitrum, polygon, celo, gnosis, moonbeam, bnb, avalanche] and their testnets
   [ChainId.OPTIMISM]: [],
   [ChainId.BASE_GOERLI]: [],
-  [ChainId.BASE]: [USDC_BASE, WRAPPED_NATIVE_CURRENCY[ChainId.BASE]],
+  [ChainId.BASE]: [USDbC_BASE, WRAPPED_NATIVE_CURRENCY[ChainId.BASE]],
   [ChainId.SCROLL_SEPOLIA]: [],
   [ChainId.SCROLL]: [WRAPPED_NATIVE_CURRENCY[ChainId.SCROLL]!, USDC_SCROLL, USDT_SCROLL, DAI_SCROLL],
 };

@@ -1,7 +1,7 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { BaseProvider, JsonRpcProvider } from '@ethersproject/providers';
 import DEFAULT_TOKEN_LIST from '../../baseswap-default.tokenlist.json';
-import { Protocol, SwapRouter, Trade } from '@baseswapfi/router-sdk';
+import { Protocol, SwapRouter, Trade, ZERO } from '@baseswapfi/router-sdk';
 import { ChainId, Currency, Fraction, Token, TradeType } from '@baseswapfi/sdk-core';
 import { TokenList } from '@uniswap/token-lists';
 import { Pool, Position, SqrtPriceMath, TickMath } from '@baseswapfi/v3-sdk2';
@@ -36,11 +36,11 @@ import {
   V2QuoteProvider,
   V2SubgraphProvider,
   TokenPropertiesProvider,
-  TokenValidationResult,
   ITokenPropertiesProvider,
 } from '../../providers';
 import { CachingTokenListProvider, ITokenListProvider } from '../../providers/caching-token-list-provider';
 import { GasPrice, IGasPriceProvider } from '../../providers/gas-price-provider';
+import { IPortionProvider, PortionProvider } from '../../providers/portion-provider';
 import { ProviderConfig } from '../../providers/provider';
 import { ITokenProvider, TokenProvider } from '../../providers/token-provider';
 import { ITokenValidatorProvider } from '../../providers/token-validator-provider';
@@ -74,6 +74,7 @@ import {
   SwapRoute,
   SwapToRatioResponse,
   SwapToRatioStatus,
+  V2Route,
   V3Route,
 } from '../router';
 
@@ -85,7 +86,14 @@ import {
 } from './entities/route-with-valid-quote';
 import { BestSwapRoute, getBestSwapRoute } from './functions/best-swap-route';
 import { calculateRatioAmountIn } from './functions/calculate-ratio-amount-in';
-import { CandidatePoolsBySelectionCriteria, PoolId } from './functions/get-candidate-pools';
+import {
+  CandidatePoolsBySelectionCriteria,
+  PoolId,
+  V2CandidatePools,
+  V3CandidatePools,
+  getV2CandidatePools,
+  getV3CandidatePools,
+} from './functions/get-candidate-pools';
 import {
   IGasModel,
   IOnChainGasModelFactory,
@@ -204,6 +212,10 @@ export type AlphaRouterParams = {
    * A provider for getting token properties for special tokens like fee-on-transfer tokens.
    */
   tokenPropertiesProvider?: ITokenPropertiesProvider;
+  /**
+   * A provider for computing the portion-related data for routes and quotes.
+   */
+  portionProvider?: IPortionProvider;
 };
 
 export class MapWithLowerCaseKey<V> extends Map<string, V> {
@@ -372,6 +384,7 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
   protected mixedQuoter: MixedQuoter;
   protected routeCachingProvider?: IRouteCachingProvider;
   protected tokenPropertiesProvider: ITokenPropertiesProvider;
+  protected portionProvider: IPortionProvider;
 
   constructor({
     chainId,
@@ -395,6 +408,7 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     simulator,
     routeCachingProvider,
     tokenPropertiesProvider,
+    portionProvider,
   }: AlphaRouterParams) {
     this.chainId = chainId;
     this.provider = provider;
@@ -507,13 +521,6 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     if (tokenValidatorProvider) {
       this.tokenValidatorProvider = tokenValidatorProvider;
     }
-    // else if (this.chainId === ChainId.MAINNET) {
-    //   this.tokenValidatorProvider = new TokenValidatorProvider(
-    //     this.chainId,
-    //     this.multicall2Provider,
-    //     new NodeJSCache(new NodeCache({ stdTTL: 30000, useClones: false }))
-    //   );
-    // }
 
     if (tokenPropertiesProvider) {
       this.tokenPropertiesProvider = tokenPropertiesProvider;
@@ -529,13 +536,7 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     if (tokenValidatorProvider) {
       this.tokenValidatorProvider = tokenValidatorProvider;
     }
-    // else if (this.chainId === ChainId.MAINNET) {
-    //   this.tokenValidatorProvider = new TokenValidatorProvider(
-    //     this.chainId,
-    //     this.multicall2Provider,
-    //     new NodeJSCache(new NodeCache({ stdTTL: 30000, useClones: false }))
-    //   );
-    // }
+
     if (tokenPropertiesProvider) {
       this.tokenPropertiesProvider = tokenPropertiesProvider;
     } else {
@@ -577,26 +578,12 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
         new TokenProvider(chainId, this.multicall2Provider)
       );
 
-    // const chainName = ID_TO_NETWORK_NAME(chainId);
+    this.portionProvider = portionProvider ?? new PortionProvider();
 
     // ipfs urls in the following format: `https://cloudflare-ipfs.com/ipns/api.uniswap.org/v1/pools/${protocol}/${chainName}.json`;
     if (v2SubgraphProvider) {
       this.v2SubgraphProvider = v2SubgraphProvider;
     } else {
-      // this.v2SubgraphProvider = new V2SubgraphProviderWithFallBacks([
-      //   new CachingV2SubgraphProvider(
-      //     chainId,
-      //     new URISubgraphProvider(
-      //       chainId,
-      //       `https://cloudflare-ipfs.com/ipns/api.uniswap.org/v1/pools/v2/${chainName}.json`, // TODO: If we needed to use V2
-      //       undefined,
-      //       0
-      //     ),
-      //     new NodeJSCache(new NodeCache({ stdTTL: 300, useClones: false }))
-      //   ),
-      //   new StaticV2SubgraphProvider(chainId),
-      // ]);
-
       // Overrides Uni to use our subgraph for the current chain (or throws for invalid chains)
       this.v2SubgraphProvider = new CachingV2SubgraphProvider(
         this.chainId,
@@ -608,19 +595,6 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     if (v3SubgraphProvider) {
       this.v3SubgraphProvider = v3SubgraphProvider;
     } else {
-      // this.v3SubgraphProvider = new V3SubgraphProviderWithFallBacks([
-      //   new CachingV3SubgraphProvider(
-      //     chainId,
-      //     new URISubgraphProvider(
-      //       chainId,
-      //       `https://cloudflare-ipfs.com/ipns/api.uniswap.org/v1/pools/v3/${chainName}.json`,
-      //       undefined,
-      //       0
-      //     ),
-      //     new NodeJSCache(new NodeCache({ stdTTL: 300, useClones: false }))
-      //   ),
-      //   new StaticV3SubgraphProvider(chainId, this.v3PoolProvider),
-      // ]);
       // Overrides Uni to use our subgraph for the current chain (or throws for invalid chains)
       this.v3SubgraphProvider = new CachingV3SubgraphProvider(
         this.chainId,
@@ -861,6 +835,20 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     swapConfig?: SwapOptions,
     partialRoutingConfig: Partial<AlphaRouterConfig> = {}
   ): Promise<SwapRoute | null> {
+    const originalAmount = amount;
+    if (tradeType === TradeType.EXACT_OUTPUT) {
+      const portionAmount = this.portionProvider.getPortionAmount(amount, tradeType, swapConfig);
+      if (portionAmount && portionAmount.greaterThan(ZERO)) {
+        // In case of exact out swap, before we route, we need to make sure that the
+        // token out amount accounts for flat portion, and token in amount after the best swap route contains the token in equivalent of portion.
+        // In other words, in case a pool's LP fee bps is lower than the portion bps (0.01%/0.05% for v3), a pool can go insolvency.
+        // This is because instead of the swapper being responsible for the portion,
+        // the pool instead gets responsible for the portion.
+        // The addition below avoids that situation.
+        amount = amount.add(portionAmount);
+      }
+    }
+
     const { currencyIn, currencyOut } = this.determineCurrencyInOutFromTradeType(tradeType, amount, quoteCurrency);
 
     const tokenIn = currencyIn.wrapped;
@@ -981,7 +969,8 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
         routingConfig,
         v3GasModel,
         mixedRouteGasModel,
-        gasPriceWei
+        gasPriceWei,
+        swapConfig
       );
     }
 
@@ -997,7 +986,8 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
         routingConfig,
         v3GasModel,
         mixedRouteGasModel,
-        gasPriceWei
+        gasPriceWei,
+        swapConfig
       );
     }
 
@@ -1079,45 +1069,12 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
       cacheMode !== CacheMode.Darkmode &&
       swapRouteFromChain
     ) {
-      const tokenPropertiesMap = await this.tokenPropertiesProvider.getTokensProperties(
-        [tokenIn, tokenOut],
-        providerConfig
-      );
-
-      const tokenInWithFotTax =
-        tokenPropertiesMap[tokenIn.address.toLowerCase()]?.tokenValidationResult === TokenValidationResult.FOT
-          ? new Token(
-              tokenIn.chainId,
-              tokenIn.address,
-              tokenIn.decimals,
-              tokenIn.symbol,
-              tokenIn.name,
-              true, // at this point we know it's valid token address
-              tokenPropertiesMap[tokenIn.address.toLowerCase()]?.tokenFeeResult?.buyFeeBps,
-              tokenPropertiesMap[tokenIn.address.toLowerCase()]?.tokenFeeResult?.sellFeeBps
-            )
-          : tokenIn;
-
-      const tokenOutWithFotTax =
-        tokenPropertiesMap[tokenOut.address.toLowerCase()]?.tokenValidationResult === TokenValidationResult.FOT
-          ? new Token(
-              tokenOut.chainId,
-              tokenOut.address,
-              tokenOut.decimals,
-              tokenOut.symbol,
-              tokenOut.name,
-              true, // at this point we know it's valid token address
-              tokenPropertiesMap[tokenOut.address.toLowerCase()]?.tokenFeeResult?.buyFeeBps,
-              tokenPropertiesMap[tokenOut.address.toLowerCase()]?.tokenFeeResult?.sellFeeBps
-            )
-          : tokenOut;
-
       // Generate the object to be cached
       const routesToCache = CachedRoutes.fromRoutesWithValidQuotes(
         swapRouteFromChain.routes,
         this.chainId,
-        tokenInWithFotTax,
-        tokenOutWithFotTax,
+        tokenIn,
+        tokenOut,
         protocols.sort(), // sort it for consistency in the order of the protocols.
         await blockNumber,
         tradeType,
@@ -1162,9 +1119,34 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
       methodParameters = buildSwapMethodParameters(trade, swapConfig, this.chainId);
     }
 
-    const swapRoute: SwapRoute = {
+    const tokenOutAmount =
+      tradeType === TradeType.EXACT_OUTPUT
+        ? originalAmount // we need to pass in originalAmount instead of amount, because amount already added portionAmount in case of exact out swap
+        : quote;
+    const portionAmount = this.portionProvider.getPortionAmount(tokenOutAmount, tradeType, swapConfig);
+    const portionQuoteAmount = this.portionProvider.getPortionQuoteAmount(
+      tradeType,
       quote,
+      amount, // we need to pass in amount instead of originalAmount here, because amount here needs to add the portion for exact out
+      portionAmount
+    );
+
+    // we need to correct quote and quote gas adjusted for exact output when portion is part of the exact out swap
+    const correctedQuote = this.portionProvider.getQuote(tradeType, quote, portionQuoteAmount);
+
+    const correctedQuoteGasAdjusted = this.portionProvider.getQuoteGasAdjusted(
+      tradeType,
       quoteGasAdjusted,
+      portionQuoteAmount
+    );
+    const quoteGasAndPortionAdjusted = this.portionProvider.getQuoteGasAndPortionAdjusted(
+      tradeType,
+      quoteGasAdjusted,
+      portionAmount
+    );
+    const swapRoute: SwapRoute = {
+      quote: correctedQuote,
+      quoteGasAdjusted: correctedQuoteGasAdjusted,
       estimatedGasUsed,
       estimatedGasUsedQuoteToken,
       estimatedGasUsedUSD,
@@ -1174,6 +1156,8 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
       methodParameters,
       blockNumber: BigNumber.from(await blockNumber),
       hitsCachedRoute: hitsCachedRoute,
+      portionAmount: portionAmount,
+      quoteGasAndPortionAdjusted: quoteGasAndPortionAdjusted,
     };
 
     if (swapConfig && swapConfig.simulate && methodParameters && methodParameters.calldata) {
@@ -1192,7 +1176,7 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
         // So we init a new CurrencyAmount object here
         CurrencyAmount.fromRawAmount(quoteCurrency, quote.quotient.toString()),
         this.l2GasDataProvider ? await this.l2GasDataProvider!.getGasData() : undefined,
-        { blockNumber }
+        providerConfig
       );
       metric.putMetric('SimulateTransaction', Date.now() - beforeSimulate, MetricLoggerUnit.Milliseconds);
       return swapRouteWithSimulation;
@@ -1210,7 +1194,8 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     routingConfig: AlphaRouterConfig,
     v3GasModel: IGasModel<V3RouteWithValidQuote>,
     mixedRouteGasModel: IGasModel<MixedRouteWithValidQuote>,
-    gasPriceWei: BigNumber
+    gasPriceWei: BigNumber,
+    swapConfig?: SwapOptions
   ): Promise<BestSwapRoute | null> {
     log.info(
       {
@@ -1261,28 +1246,28 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     }
 
     if (v2Routes.length > 0) {
+      const v2RoutesFromCache: V2Route[] = v2Routes.map((cachedRoute) => cachedRoute.route as V2Route);
       metric.putMetric('SwapRouteFromCache_V2_GetQuotes_Request', 1, MetricLoggerUnit.Count);
-      const beforeGetRoutesAndQuotes = Date.now();
+
+      const beforeGetQuotes = Date.now();
 
       quotePromises.push(
-        // When we fetch the quotes in V2, we are not calling the `onChainProvider` like on v3Routes and mixedRoutes
-        // Instead we are using the reserves in the Pool object, so we need to re-load the current reserves.
         this.v2Quoter
-          .getRoutesThenQuotes(
-            v2Routes[0]!.tokenIn,
-            v2Routes[0]!.tokenOut,
+          .refreshRoutesThenGetQuotes(
+            cachedRoutes.tokenIn,
+            cachedRoutes.tokenOut,
+            v2RoutesFromCache,
             amounts,
             percents,
             quoteToken,
             tradeType,
             routingConfig,
-            undefined,
             gasPriceWei
           )
           .then((result) => {
             metric.putMetric(
-              `SwapRouteFromCache_V2_GetRoutesAndQuotes_Load`,
-              Date.now() - beforeGetRoutesAndQuotes,
+              `SwapRouteFromCache_V2_GetQuotes_Load`,
+              Date.now() - beforeGetQuotes,
               MetricLoggerUnit.Milliseconds
             );
 
@@ -1331,7 +1316,9 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
       tradeType,
       this.chainId,
       routingConfig,
-      v3GasModel
+      this.portionProvider,
+      v3GasModel,
+      swapConfig
     );
   }
 
@@ -1345,7 +1332,8 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     routingConfig: AlphaRouterConfig,
     v3GasModel: IGasModel<V3RouteWithValidQuote>,
     mixedRouteGasModel: IGasModel<MixedRouteWithValidQuote>,
-    gasPriceWei: BigNumber
+    gasPriceWei: BigNumber,
+    swapConfig?: SwapOptions
   ): Promise<BestSwapRoute | null> {
     // Generate our distribution of amounts, i.e. fractions of the input amount.
     // We will get quotes for fractions of the input amount for different routes, then
@@ -1357,9 +1345,53 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     const v2ProtocolSpecified = protocols.includes(Protocol.V2);
     const v2SupportedInChain = V2_SUPPORTED.includes(this.chainId);
     const shouldQueryMixedProtocol = protocols.includes(Protocol.MIXED) || (noProtocolsSpecified && v2SupportedInChain);
-    // const mixedProtocolAllowed =
-    //   [ChainId.MAINNET, ChainId.GOERLI].includes(this.chainId) && tradeType === TradeType.EXACT_INPUT;
-    const mixedProtocolAllowed = false;
+    const mixedProtocolAllowed =
+      [ChainId.BASE, ChainId.BASE_GOERLI, ChainId.SCROLL, ChainId.SCROLL_SEPOLIA].includes(this.chainId) &&
+      tradeType === TradeType.EXACT_INPUT;
+
+    const beforeGetCandidates = Date.now();
+
+    let v3CandidatePoolsPromise: Promise<V3CandidatePools | undefined> = Promise.resolve(undefined);
+    if (v3ProtocolSpecified || noProtocolsSpecified || (shouldQueryMixedProtocol && mixedProtocolAllowed)) {
+      v3CandidatePoolsPromise = getV3CandidatePools({
+        tokenIn,
+        tokenOut,
+        tokenProvider: this.tokenProvider,
+        blockedTokenListProvider: this.blockedTokenListProvider,
+        poolProvider: this.v3PoolProvider,
+        routeType: tradeType,
+        subgraphProvider: this.v3SubgraphProvider,
+        routingConfig,
+        chainId: this.chainId,
+      }).then((candidatePools) => {
+        metric.putMetric('GetV3CandidatePools', Date.now() - beforeGetCandidates, MetricLoggerUnit.Milliseconds);
+        return candidatePools;
+      });
+    }
+
+    let v2CandidatePoolsPromise: Promise<V2CandidatePools | undefined> = Promise.resolve(undefined);
+    if (
+      (v2SupportedInChain && (v2ProtocolSpecified || noProtocolsSpecified)) ||
+      (shouldQueryMixedProtocol && mixedProtocolAllowed)
+    ) {
+      // Fetch all the pools that we will consider routing via. There are thousands
+      // of pools, so we filter them to a set of candidate pools that we expect will
+      // result in good prices.
+      v2CandidatePoolsPromise = getV2CandidatePools({
+        tokenIn,
+        tokenOut,
+        tokenProvider: this.tokenProvider,
+        blockedTokenListProvider: this.blockedTokenListProvider,
+        poolProvider: this.v2PoolProvider,
+        routeType: tradeType,
+        subgraphProvider: this.v2SubgraphProvider,
+        routingConfig,
+        chainId: this.chainId,
+      }).then((candidatePools) => {
+        metric.putMetric('GetV2CandidatePools', Date.now() - beforeGetCandidates, MetricLoggerUnit.Milliseconds);
+        return candidatePools;
+      });
+    }
 
     const quotePromises: Promise<GetQuotesResult>[] = [];
 
@@ -1371,17 +1403,30 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
       const beforeGetRoutesThenQuotes = Date.now();
 
       quotePromises.push(
-        this.v3Quoter
-          .getRoutesThenQuotes(tokenIn, tokenOut, amounts, percents, quoteToken, tradeType, routingConfig, v3GasModel)
-          .then((result) => {
-            metric.putMetric(
-              `SwapRouteFromChain_V3_GetRoutesThenQuotes_Load`,
-              Date.now() - beforeGetRoutesThenQuotes,
-              MetricLoggerUnit.Milliseconds
-            );
+        v3CandidatePoolsPromise.then((v3CandidatePools) =>
+          this.v3Quoter
+            .getRoutesThenQuotes(
+              tokenIn,
+              tokenOut,
+              amount,
+              amounts,
+              percents,
+              quoteToken,
+              v3CandidatePools!,
+              tradeType,
+              routingConfig,
+              v3GasModel
+            )
+            .then((result) => {
+              metric.putMetric(
+                `SwapRouteFromChain_V3_GetRoutesThenQuotes_Load`,
+                Date.now() - beforeGetRoutesThenQuotes,
+                MetricLoggerUnit.Milliseconds
+              );
 
-            return result;
-          })
+              return result;
+            })
+        )
       );
     }
 
@@ -1393,27 +1438,31 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
       const beforeGetRoutesThenQuotes = Date.now();
 
       quotePromises.push(
-        this.v2Quoter
-          .getRoutesThenQuotes(
-            tokenIn,
-            tokenOut,
-            amounts,
-            percents,
-            quoteToken,
-            tradeType,
-            routingConfig,
-            undefined,
-            gasPriceWei
-          )
-          .then((result) => {
-            metric.putMetric(
-              `SwapRouteFromChain_V2_GetRoutesThenQuotes_Load`,
-              Date.now() - beforeGetRoutesThenQuotes,
-              MetricLoggerUnit.Milliseconds
-            );
+        v2CandidatePoolsPromise.then((v2CandidatePools) =>
+          this.v2Quoter
+            .getRoutesThenQuotes(
+              tokenIn,
+              tokenOut,
+              amount,
+              amounts,
+              percents,
+              quoteToken,
+              v2CandidatePools!,
+              tradeType,
+              routingConfig,
+              undefined,
+              gasPriceWei
+            )
+            .then((result) => {
+              metric.putMetric(
+                `SwapRouteFromChain_V2_GetRoutesThenQuotes_Load`,
+                Date.now() - beforeGetRoutesThenQuotes,
+                MetricLoggerUnit.Milliseconds
+              );
 
-            return result;
-          })
+              return result;
+            })
+        )
       );
     }
 
@@ -1427,26 +1476,30 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
       const beforeGetRoutesThenQuotes = Date.now();
 
       quotePromises.push(
-        this.mixedQuoter
-          .getRoutesThenQuotes(
-            tokenIn,
-            tokenOut,
-            amounts,
-            percents,
-            quoteToken,
-            tradeType,
-            routingConfig,
-            mixedRouteGasModel
-          )
-          .then((result) => {
-            metric.putMetric(
-              `SwapRouteFromChain_Mixed_GetRoutesThenQuotes_Load`,
-              Date.now() - beforeGetRoutesThenQuotes,
-              MetricLoggerUnit.Milliseconds
-            );
+        Promise.all([v3CandidatePoolsPromise, v2CandidatePoolsPromise]).then(([v3CandidatePools, v2CandidatePools]) =>
+          this.mixedQuoter
+            .getRoutesThenQuotes(
+              tokenIn,
+              tokenOut,
+              amount,
+              amounts,
+              percents,
+              quoteToken,
+              [v3CandidatePools!, v2CandidatePools!],
+              tradeType,
+              routingConfig,
+              mixedRouteGasModel
+            )
+            .then((result) => {
+              metric.putMetric(
+                `SwapRouteFromChain_Mixed_GetRoutesThenQuotes_Load`,
+                Date.now() - beforeGetRoutesThenQuotes,
+                MetricLoggerUnit.Milliseconds
+              );
 
-            return result;
-          })
+              return result;
+            })
+        )
       );
     }
 
@@ -1474,7 +1527,9 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
       tradeType,
       this.chainId,
       routingConfig,
-      v3GasModel
+      this.portionProvider,
+      v3GasModel,
+      swapConfig
     );
 
     if (bestSwapRoute) {

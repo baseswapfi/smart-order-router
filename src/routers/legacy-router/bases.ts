@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ChainId, Token } from '@baseswapfi/sdk-core';
 
-import { ITokenProvider, USDC_BASE, DAI_BASE } from '../../providers/token-provider';
+import { ITokenProvider, USDbC_BASE, DAI_BASE } from '../../providers/token-provider';
 import { WRAPPED_NATIVE_CURRENCY } from '../../util/chains';
 
 type ChainTokenList = {
@@ -31,7 +31,7 @@ export const BASES_TO_CHECK_TRADES_AGAINST = (_tokenProvider: ITokenProvider): C
     // [ChainId.MOONBEAM]: [WRAPPED_NATIVE_CURRENCY[ChainId.MOONBEAM]],
     // [ChainId.BNB]: [WRAPPED_NATIVE_CURRENCY[ChainId.BNB]!, BUSD_BNB, DAI_BNB, USDC_BNB, USDT_BNB, BTC_BNB],
     // [ChainId.AVALANCHE]: [WRAPPED_NATIVE_CURRENCY[ChainId.AVALANCHE]!, USDC_AVAX, DAI_AVAX],
-    [ChainId.BASE]: [WRAPPED_NATIVE_CURRENCY[ChainId.BASE]!, USDC_BASE, DAI_BASE],
+    [ChainId.BASE]: [WRAPPED_NATIVE_CURRENCY[ChainId.BASE]!, USDbC_BASE, DAI_BASE],
     [ChainId.BASE_GOERLI]: [WRAPPED_NATIVE_CURRENCY[ChainId.BASE_GOERLI]!],
     [ChainId.SCROLL_SEPOLIA]: [WRAPPED_NATIVE_CURRENCY[ChainId.SCROLL_SEPOLIA]],
     [ChainId.SCROLL]: [WRAPPED_NATIVE_CURRENCY[ChainId.SCROLL]],
