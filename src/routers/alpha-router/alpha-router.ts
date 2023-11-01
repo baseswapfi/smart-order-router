@@ -36,6 +36,7 @@ import {
   V2QuoteProvider,
   V2SubgraphProvider,
   TokenPropertiesProvider,
+  TokenValidationResult,
   ITokenPropertiesProvider,
 } from '../../providers';
 import { CachingTokenListProvider, ITokenListProvider } from '../../providers/caching-token-list-provider';
@@ -93,8 +94,10 @@ import {
 } from './gas-models/gas-model';
 import { MixedRouteHeuristicGasModelFactory } from './gas-models/mixedRoute/mixed-route-heuristic-gas-model';
 import { V2HeuristicGasModelFactory } from './gas-models/v2/v2-heuristic-gas-model';
+import { NATIVE_OVERHEAD } from './gas-models/v3/gas-costs';
 import { V3HeuristicGasModelFactory } from './gas-models/v3/v3-heuristic-gas-model';
 import { GetQuotesResult, MixedQuoter, V2Quoter, V3Quoter } from './quoters';
+import { OnChainTokenFeeFetcher } from '../../providers/token-fee-fetcher';
 
 export type AlphaRouterParams = {
   /**
@@ -334,6 +337,14 @@ export type AlphaRouterConfig = {
    * Debug param that helps to see the short-term latencies improvements without impacting the main path.
    */
   debugRouting?: boolean;
+  /**
+   * Flag that allow us to override the cache mode.
+   */
+  overwriteCacheMode?: CacheMode;
+  /**
+   * Flag for token properties provider to enable fetching fee-on-transfer tokens.
+   */
+  enableFeeOnTransferFeeFetching?: boolean;
 };
 
 export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<AlphaRouterConfig, SwapAndAddConfig> {
@@ -360,7 +371,7 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
   protected v3Quoter: V3Quoter;
   protected mixedQuoter: MixedQuoter;
   protected routeCachingProvider?: IRouteCachingProvider;
-  protected tokenPropertiesProvider?: ITokenPropertiesProvider;
+  protected tokenPropertiesProvider: ITokenPropertiesProvider;
 
   constructor({
     chainId,
@@ -493,11 +504,54 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
       }
     }
 
+    if (tokenValidatorProvider) {
+      this.tokenValidatorProvider = tokenValidatorProvider;
+    }
+    // else if (this.chainId === ChainId.MAINNET) {
+    //   this.tokenValidatorProvider = new TokenValidatorProvider(
+    //     this.chainId,
+    //     this.multicall2Provider,
+    //     new NodeJSCache(new NodeCache({ stdTTL: 30000, useClones: false }))
+    //   );
+    // }
+
+    if (tokenPropertiesProvider) {
+      this.tokenPropertiesProvider = tokenPropertiesProvider;
+    } else {
+      this.tokenPropertiesProvider = new TokenPropertiesProvider(
+        this.chainId,
+        this.tokenValidatorProvider!,
+        new NodeJSCache(new NodeCache({ stdTTL: 86400, useClones: false })),
+        new OnChainTokenFeeFetcher(this.chainId, provider)
+      );
+    }
+
+    if (tokenValidatorProvider) {
+      this.tokenValidatorProvider = tokenValidatorProvider;
+    }
+    // else if (this.chainId === ChainId.MAINNET) {
+    //   this.tokenValidatorProvider = new TokenValidatorProvider(
+    //     this.chainId,
+    //     this.multicall2Provider,
+    //     new NodeJSCache(new NodeCache({ stdTTL: 30000, useClones: false }))
+    //   );
+    // }
+    if (tokenPropertiesProvider) {
+      this.tokenPropertiesProvider = tokenPropertiesProvider;
+    } else {
+      this.tokenPropertiesProvider = new TokenPropertiesProvider(
+        this.chainId,
+        this.tokenValidatorProvider!,
+        new NodeJSCache(new NodeCache({ stdTTL: 86400, useClones: false })),
+        new OnChainTokenFeeFetcher(this.chainId, provider)
+      );
+    }
+
     this.v2PoolProvider =
       v2PoolProvider ??
       new CachingV2PoolProvider(
         chainId,
-        new V2PoolProvider(chainId, this.multicall2Provider),
+        new V2PoolProvider(chainId, this.multicall2Provider, this.tokenPropertiesProvider),
         new NodeJSCache(new NodeCache({ stdTTL: 60, useClones: false }))
       );
 
@@ -605,28 +659,6 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     }
     // if (chainId === ChainId.ARBITRUM_ONE || chainId === ChainId.ARBITRUM_GOERLI) {
     //   this.l2GasDataProvider = arbitrumGasDataProvider ?? new ArbitrumGasDataProvider(chainId, this.provider);
-    // }
-    if (tokenValidatorProvider) {
-      this.tokenValidatorProvider = tokenValidatorProvider;
-    }
-    // else if (this.chainId === ChainId.MAINNET) {
-    //   this.tokenValidatorProvider = new TokenValidatorProvider(
-    //     this.chainId,
-    //     this.multicall2Provider,
-    //     new NodeJSCache(new NodeCache({ stdTTL: 30000, useClones: false }))
-    //   );
-    // }
-
-    if (tokenPropertiesProvider) {
-      this.tokenPropertiesProvider = tokenPropertiesProvider;
-    }
-    // else if (this.chainId === ChainId.MAINNET) {
-    //   this.tokenPropertiesProvider = new TokenPropertiesProvider(
-    //     this.chainId,
-    //     this.tokenValidatorProvider!,
-    //     new NodeJSCache(new NodeCache({ stdTTL: 86400, useClones: false })),
-    //     new OnChainTokenFeeFetcher(this.chainId, provider)
-    //   )
     // }
 
     // Initialize the Quoters.
@@ -861,10 +893,18 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     const gasPriceWei = await this.getGasPriceWei();
 
     const quoteToken = quoteCurrency.wrapped;
-
-    const [v3GasModel, mixedRouteGasModel] = await this.getGasModels(gasPriceWei, amount.currency.wrapped, quoteToken, {
+    const providerConfig: ProviderConfig = {
+      ...routingConfig,
       blockNumber,
-    });
+      additionalGasOverhead: NATIVE_OVERHEAD(this.chainId, amount.currency, quoteCurrency),
+    };
+
+    const [v3GasModel, mixedRouteGasModel] = await this.getGasModels(
+      gasPriceWei,
+      amount.currency.wrapped,
+      quoteToken,
+      providerConfig
+    );
 
     // Create a Set to sanitize the protocols input, a Set of undefined becomes an empty set,
     // Then create an Array from the values of that Set.
@@ -1031,12 +1071,45 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
       cacheMode !== CacheMode.Darkmode &&
       swapRouteFromChain
     ) {
+      const tokenPropertiesMap = await this.tokenPropertiesProvider.getTokensProperties(
+        [tokenIn, tokenOut],
+        providerConfig
+      );
+
+      const tokenInWithFotTax =
+        tokenPropertiesMap[tokenIn.address.toLowerCase()]?.tokenValidationResult === TokenValidationResult.FOT
+          ? new Token(
+              tokenIn.chainId,
+              tokenIn.address,
+              tokenIn.decimals,
+              tokenIn.symbol,
+              tokenIn.name,
+              true, // at this point we know it's valid token address
+              tokenPropertiesMap[tokenIn.address.toLowerCase()]?.tokenFeeResult?.buyFeeBps,
+              tokenPropertiesMap[tokenIn.address.toLowerCase()]?.tokenFeeResult?.sellFeeBps
+            )
+          : tokenIn;
+
+      const tokenOutWithFotTax =
+        tokenPropertiesMap[tokenOut.address.toLowerCase()]?.tokenValidationResult === TokenValidationResult.FOT
+          ? new Token(
+              tokenOut.chainId,
+              tokenOut.address,
+              tokenOut.decimals,
+              tokenOut.symbol,
+              tokenOut.name,
+              true, // at this point we know it's valid token address
+              tokenPropertiesMap[tokenOut.address.toLowerCase()]?.tokenFeeResult?.buyFeeBps,
+              tokenPropertiesMap[tokenOut.address.toLowerCase()]?.tokenFeeResult?.sellFeeBps
+            )
+          : tokenOut;
+
       // Generate the object to be cached
       const routesToCache = CachedRoutes.fromRoutesWithValidQuotes(
         swapRouteFromChain.routes,
         this.chainId,
-        tokenIn,
-        tokenOut,
+        tokenInWithFotTax,
+        tokenOutWithFotTax,
         protocols.sort(), // sort it for consistency in the order of the protocols.
         await blockNumber,
         tradeType,
