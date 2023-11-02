@@ -12,11 +12,11 @@ import { CurrencyAmount } from '../../../util/amounts';
 import { log } from '../../../util/log';
 import { metric, MetricLoggerUnit } from '../../../util/metric';
 import { routeAmountsToString, routeToString } from '../../../util/routes';
+import { SwapOptions } from '../../router';
 import { AlphaRouterConfig } from '../alpha-router';
 import { IGasModel, L1ToL2GasCosts, usdGasTokensByChain } from '../gas-models';
 
 import { RouteWithValidQuote, V3RouteWithValidQuote } from './../entities/route-with-valid-quote';
-import { SwapOptions } from '../../router';
 
 export type BestSwapRoute = {
   quote: CurrencyAmount;
@@ -488,6 +488,7 @@ export async function getBestSwapRouteBy(
     routes: portionProvider.getRouteWithQuotePortionAdjusted(routeType, routeWithQuotes, swapConfig),
   };
 }
+
 // We do not allow pools to be re-used across split routes, as swapping through a pool changes the pools state.
 // Given a list of used routes, this function finds the first route in the list of candidate routes that does not re-use an already used pool.
 const findFirstRouteNotUsingUsedPools = (

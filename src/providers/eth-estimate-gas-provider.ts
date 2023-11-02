@@ -5,8 +5,8 @@ import { ChainId } from '@baseswapfi/sdk-core';
 import { SwapOptions, SwapRoute, SwapType } from '../routers';
 import { log } from '../util';
 import { calculateGasUsed, initSwapRouteFromExisting } from '../util/gas-factory-helpers';
-
 import { IPortionProvider } from './portion-provider';
+
 import { ProviderConfig } from './provider';
 import { SimulationStatus, Simulator } from './simulation-provider';
 import { IV2PoolProvider } from './v2/pool-provider';
@@ -97,17 +97,21 @@ export class EthEstimateGasSimulator extends Simulator {
       l2GasData,
       providerConfig
     );
+    const portionAmount = this.portionProvider.getQuoteGasAndPortionAdjusted(
+      route.trade.tradeType,
+      quoteGasAdjusted,
+      route.portionAmount
+    );
     return {
       ...initSwapRouteFromExisting(
         route,
         this.v2PoolProvider,
         this.v3PoolProvider,
-        this.portionProvider,
         quoteGasAdjusted,
         estimatedGasUsed,
         estimatedGasUsedQuoteToken,
         estimatedGasUsedUSD,
-        swapOptions
+        portionAmount
       ),
       simulationStatus: SimulationStatus.Succeeded,
     };

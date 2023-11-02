@@ -173,6 +173,11 @@ export class TenderlySimulator extends Simulator {
     const currencyIn = swapRoute.trade.inputAmount.currency;
     const tokenIn = currencyIn.wrapped;
     const chainId = this.chainId;
+    // if ([ChainId.CELO, ChainId.CELO_ALFAJORES].includes(chainId)) {
+    //   const msg = 'Celo not supported by Tenderly!';
+    //   log.info(msg);
+    //   return { ...swapRoute, simulationStatus: SimulationStatus.NotSupported };
+    // }
 
     if (!swapRoute.methodParameters) {
       const msg = 'No calldata provided to simulate transaction';
@@ -402,17 +407,23 @@ export class TenderlySimulator extends Simulator {
       l2GasData,
       providerConfig
     );
+    const quoteGasAndPortionAdjusted = swapRoute.portionAmount
+      ? this.portionProvider.getQuoteGasAndPortionAdjusted(
+          swapRoute.trade.tradeType,
+          quoteGasAdjusted,
+          swapRoute.portionAmount
+        )
+      : undefined;
     return {
       ...initSwapRouteFromExisting(
         swapRoute,
         this.v2PoolProvider,
         this.v3PoolProvider,
-        this.portionProvider,
         quoteGasAdjusted,
         estimatedGasUsed,
         estimatedGasUsedQuoteToken,
         estimatedGasUsedUSD,
-        swapOptions
+        quoteGasAndPortionAdjusted
       ),
       simulationStatus: SimulationStatus.Succeeded,
     };

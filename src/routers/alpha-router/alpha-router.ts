@@ -1,7 +1,7 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { BaseProvider, JsonRpcProvider } from '@ethersproject/providers';
 import DEFAULT_TOKEN_LIST from '../../baseswap-default.tokenlist.json';
-import { Protocol, SwapRouter, Trade } from '@baseswapfi/router-sdk';
+import { Protocol, SwapRouter, Trade, ZERO } from '@baseswapfi/router-sdk';
 import { ChainId, Currency, Fraction, Token, TradeType } from '@baseswapfi/sdk-core';
 import { TokenList } from '@uniswap/token-lists';
 import { Pool, Position, SqrtPriceMath, TickMath } from '@baseswapfi/v3-sdk2';
@@ -77,7 +77,6 @@ import {
   V2Route,
   V3Route,
 } from '../router';
-
 import { DEFAULT_ROUTING_CONFIG_BY_CHAIN, ETH_GAS_STATION_API_URL } from './config';
 import {
   MixedRouteWithValidQuote,
@@ -840,6 +839,20 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     swapConfig?: SwapOptions,
     partialRoutingConfig: Partial<AlphaRouterConfig> = {}
   ): Promise<SwapRoute | null> {
+    const originalAmount = amount;
+    if (tradeType === TradeType.EXACT_OUTPUT) {
+      const portionAmount = this.portionProvider.getPortionAmount(amount, tradeType, swapConfig);
+      if (portionAmount && portionAmount.greaterThan(ZERO)) {
+        // In case of exact out swap, before we route, we need to make sure that the
+        // token out amount accounts for flat portion, and token in amount after the best swap route contains the token in equivalent of portion.
+        // In other words, in case a pool's LP fee bps is lower than the portion bps (0.01%/0.05% for v3), a pool can go insolvency.
+        // This is because instead of the swapper being responsible for the portion,
+        // the pool instead gets responsible for the portion.
+        // The addition below avoids that situation.
+        amount = amount.add(portionAmount);
+      }
+    }
+
     const { currencyIn, currencyOut } = this.determineCurrencyInOutFromTradeType(tradeType, amount, quoteCurrency);
 
     const tokenIn = currencyIn.wrapped;
@@ -960,7 +973,8 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
         routingConfig,
         v3GasModel,
         mixedRouteGasModel,
-        gasPriceWei
+        gasPriceWei,
+        swapConfig
       );
     }
 
@@ -976,7 +990,8 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
         routingConfig,
         v3GasModel,
         mixedRouteGasModel,
-        gasPriceWei
+        gasPriceWei,
+        swapConfig
       );
     }
 
@@ -1108,9 +1123,34 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
       methodParameters = buildSwapMethodParameters(trade, swapConfig, this.chainId);
     }
 
-    const swapRoute: SwapRoute = {
+    const tokenOutAmount =
+      tradeType === TradeType.EXACT_OUTPUT
+        ? originalAmount // we need to pass in originalAmount instead of amount, because amount already added portionAmount in case of exact out swap
+        : quote;
+    const portionAmount = this.portionProvider.getPortionAmount(tokenOutAmount, tradeType, swapConfig);
+    const portionQuoteAmount = this.portionProvider.getPortionQuoteAmount(
+      tradeType,
       quote,
+      amount, // we need to pass in amount instead of originalAmount here, because amount here needs to add the portion for exact out
+      portionAmount
+    );
+
+    // we need to correct quote and quote gas adjusted for exact output when portion is part of the exact out swap
+    const correctedQuote = this.portionProvider.getQuote(tradeType, quote, portionQuoteAmount);
+
+    const correctedQuoteGasAdjusted = this.portionProvider.getQuoteGasAdjusted(
+      tradeType,
       quoteGasAdjusted,
+      portionQuoteAmount
+    );
+    const quoteGasAndPortionAdjusted = this.portionProvider.getQuoteGasAndPortionAdjusted(
+      tradeType,
+      quoteGasAdjusted,
+      portionAmount
+    );
+    const swapRoute: SwapRoute = {
+      quote: correctedQuote,
+      quoteGasAdjusted: correctedQuoteGasAdjusted,
       estimatedGasUsed,
       estimatedGasUsedQuoteToken,
       estimatedGasUsedUSD,
@@ -1120,6 +1160,8 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
       methodParameters,
       blockNumber: BigNumber.from(await blockNumber),
       hitsCachedRoute: hitsCachedRoute,
+      portionAmount: portionAmount,
+      quoteGasAndPortionAdjusted: quoteGasAndPortionAdjusted,
     };
 
     if (swapConfig && swapConfig.simulate && methodParameters && methodParameters.calldata) {
