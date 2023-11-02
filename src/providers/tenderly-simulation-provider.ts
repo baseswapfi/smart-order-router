@@ -13,6 +13,7 @@ import { APPROVE_TOKEN_FOR_TRANSFER } from '../util/callData';
 import { calculateGasUsed, initSwapRouteFromExisting } from '../util/gas-factory-helpers';
 
 import { EthEstimateGasSimulator } from './eth-estimate-gas-provider';
+import { IPortionProvider } from './portion-provider';
 import { ProviderConfig } from './provider';
 import { SimulationResult, SimulationStatus, Simulator } from './simulation-provider';
 import { IV2PoolProvider } from './v2/pool-provider';
@@ -72,10 +73,11 @@ export class FallbackTenderlySimulator extends Simulator {
   constructor(
     chainId: ChainId,
     provider: JsonRpcProvider,
+    portionProvider: IPortionProvider,
     tenderlySimulator: TenderlySimulator,
     ethEstimateGasSimulator: EthEstimateGasSimulator
   ) {
-    super(provider, chainId);
+    super(provider, portionProvider, chainId);
     this.tenderlySimulator = tenderlySimulator;
     this.ethEstimateGasSimulator = ethEstimateGasSimulator;
   }
@@ -146,10 +148,11 @@ export class TenderlySimulator extends Simulator {
     v2PoolProvider: IV2PoolProvider,
     v3PoolProvider: IV3PoolProvider,
     provider: JsonRpcProvider,
+    portionProvider: IPortionProvider,
     overrideEstimateMultiplier?: { [chainId in ChainId]?: number },
     tenderlyRequestTimeout?: number
   ) {
-    super(provider, chainId);
+    super(provider, portionProvider, chainId);
     this.tenderlyBaseUrl = tenderlyBaseUrl;
     this.tenderlyUser = tenderlyUser;
     this.tenderlyProject = tenderlyProject;
@@ -190,7 +193,7 @@ export class TenderlySimulator extends Simulator {
       'Simulating transaction on Tenderly'
     );
 
-    const blockNumber = await providerConfig?.blockNumber;
+    // const blockNumber = await providerConfig?.blockNumber;
     let estimatedGasUsed: BigNumber;
     const estimateMultiplier = this.overrideEstimateMultiplier[chainId] ?? DEFAULT_ESTIMATE_MULTIPLIER;
 
@@ -404,10 +407,12 @@ export class TenderlySimulator extends Simulator {
         swapRoute,
         this.v2PoolProvider,
         this.v3PoolProvider,
+        this.portionProvider,
         quoteGasAdjusted,
         estimatedGasUsed,
         estimatedGasUsedQuoteToken,
-        estimatedGasUsedUSD
+        estimatedGasUsedUSD,
+        swapOptions
       ),
       simulationStatus: SimulationStatus.Succeeded,
     };
