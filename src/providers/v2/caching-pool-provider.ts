@@ -78,12 +78,16 @@ export class CachingV2PoolProvider implements IV2PoolProvider {
     );
 
     if (poolsToGetAddresses.length > 0) {
-      const poolAccessor = await this.poolProvider.getPools(poolsToGetTokenPairs, providerConfig);
+      const poolAccessor = await this.poolProvider.getPools(poolsToGetTokenPairs, {
+        ...providerConfig,
+        enableFeeOnTransferFeeFetching: true,
+      });
       for (const address of poolsToGetAddresses) {
         const pool = poolAccessor.getPoolByAddress(address);
         if (pool) {
           poolAddressToPool[address] = pool;
-          await this.cache.set(this.POOL_KEY(this.chainId, address), {
+          // We don't want to wait for this caching to complete before returning the pools.
+          this.cache.set(this.POOL_KEY(this.chainId, address), {
             pair: pool,
             block: blockNumber,
           });
