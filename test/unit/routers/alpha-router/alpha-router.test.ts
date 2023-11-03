@@ -394,8 +394,8 @@ describe('alpha router', () => {
         ),
       };
     });
-    v2MockGasModel.calculateL1GasFees.callsFake((r: V2RouteWithValidQuote) => {
-      (route: V3RouteWithValidQuote[]) => {
+    v2MockGasModel.calculateL1GasFees.callsFake(
+      (route: V2RouteWithValidQuote[]) => {
         const r: any = route[0];
         return {
           gasUsedL1: BigNumber.from(0),
@@ -408,8 +408,8 @@ describe('alpha router', () => {
             r.quote.multiply(new Fraction(95, 100)).quotient
           ),
         };
-      };
-    });
+      }
+    );
     mockV2GasModelFactory.buildGasModel.resolves(v2MockGasModel);
 
     mockBlockTokenListProvider = sinon.createStubInstance(
@@ -545,43 +545,43 @@ describe('alpha router', () => {
 
       expect(swap).toBeDefined();
 
-      // expect(mockFallbackTenderlySimulator.simulate.called).toBeFalsy();
-      // expect(mockProvider.getBlockNumber.called).toBeTruthy();
-      // expect(mockGasPriceProvider.getGasPrice.called).toBeTruthy();
-      // expect(
-      //   mockV3GasModelFactory.buildGasModel.calledWith({
-      //     chainId,
-      //     gasPriceWei: mockGasPriceWeiBN,
-      //     pools: sinon.match.any,
-      //     amountToken: amount.currency,
-      //     quoteToken: WRAPPED_NATIVE_CURRENCY[1],
-      //     v2poolProvider: sinon.match.any,
-      //     l2GasDataProvider: undefined,
-      //     providerConfig: sinon.match({
-      //       blockNumber: sinon.match.instanceOf(Promise)
-      //     })
-      //   })
-      // ).toBeTruthy();
-      // expect(
-      //   mockV2GasModelFactory.buildGasModel.calledWith({
-      //     chainId,
-      //     gasPriceWei: mockGasPriceWeiBN,
-      //     poolProvider: sinon.match.any,
-      //     token: WRAPPED_NATIVE_CURRENCY[1],
-      //     providerConfig: sinon.match.any,
-      //   })
-      // ).toBeTruthy();
-      // expect(
-      //   mockMixedRouteGasModelFactory.buildGasModel.calledWith({
-      //     chainId,
-      //     gasPriceWei: mockGasPriceWeiBN,
-      //     pools: sinon.match.any, /// v3 pool provider
-      //     v2poolProvider: sinon.match.any,
-      //     amountToken: amount.currency,
-      //     quoteToken: WRAPPED_NATIVE_CURRENCY[1],
-      //     providerConfig: sinon.match.any
-      //   })
-      // ).toBeTruthy();
+      expect(mockFallbackTenderlySimulator.simulate.called).toBeFalsy();
+      expect(mockProvider.getBlockNumber.called).toBeTruthy();
+      expect(mockGasPriceProvider.getGasPrice.called).toBeTruthy();
+      expect(
+        mockV3GasModelFactory.buildGasModel.calledWith({
+          chainId,
+          gasPriceWei: mockGasPriceWeiBN,
+          pools: sinon.match.any,
+          amountToken: amount.currency,
+          quoteToken: WETH,
+          v2poolProvider: sinon.match.any,
+          l2GasDataProvider: sinon.match.any,
+          providerConfig: sinon.match({
+            blockNumber: sinon.match.instanceOf(Promise),
+          }),
+        })
+      ).toBeTruthy();
+      expect(
+        mockV2GasModelFactory.buildGasModel.calledWith({
+          chainId,
+          gasPriceWei: mockGasPriceWeiBN,
+          poolProvider: sinon.match.any,
+          token: WETH,
+          providerConfig: sinon.match.any,
+        })
+      ).toBeTruthy();
+      expect(
+        mockMixedRouteGasModelFactory.buildGasModel.calledWith({
+          chainId,
+          gasPriceWei: mockGasPriceWeiBN,
+          pools: sinon.match.any, /// v3 pool provider
+          v2poolProvider: sinon.match.any,
+          amountToken: amount.currency,
+          quoteToken: WETH,
+          providerConfig: sinon.match.any,
+        })
+      ).toBeTruthy();
     });
   });
 });
