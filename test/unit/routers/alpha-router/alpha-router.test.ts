@@ -1,6 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { BaseProvider } from '@ethersproject/providers';
-// import { Protocol, SwapRouter } from '@baseswapfi/router-sdk';
+import { Protocol } from '@baseswapfi/router-sdk';
 import { ChainId, Fraction, TradeType } from '@baseswapfi/sdk-core';
 import { Pair } from '@baseswapfi/v2-sdk';
 import { encodeSqrtRatioX96, Pool } from '@baseswapfi/v3-sdk2';
@@ -540,6 +540,7 @@ describe('alpha router', () => {
         undefined,
         {
           ...ROUTING_CONFIG,
+          debugRouting: true,
         }
       );
 
@@ -575,13 +576,73 @@ describe('alpha router', () => {
         mockMixedRouteGasModelFactory.buildGasModel.calledWith({
           chainId,
           gasPriceWei: mockGasPriceWeiBN,
-          pools: sinon.match.any, /// v3 pool provider
+          pools: sinon.match.any, // v3 pool provider
           v2poolProvider: sinon.match.any,
           amountToken: amount.currency,
           quoteToken: WETH,
           providerConfig: sinon.match.any,
         })
       ).toBeTruthy();
+
+      sinon.assert.calledWith(
+        mockOnChainQuoteProvider.getQuotesManyExactIn,
+        sinon.match((value) => {
+          return value instanceof Array && value.length == 4;
+        }),
+        sinon.match.array,
+        sinon.match({ blockNumber: sinon.match.defined })
+      );
+
+      // V3, then mixedRoutes
+      sinon.assert.callCount(mockOnChainQuoteProvider.getQuotesManyExactIn, 2);
+      sinon.assert.calledWith(
+        mockV2QuoteProvider.getQuotesManyExactIn,
+        sinon.match((value) => {
+          // return value instanceof Array && value.length == 4; // TODO: Why 4?
+          return value instanceof Array;
+        }),
+        sinon.match.array
+      );
+      sinon.assert.notCalled(mockOnChainQuoteProvider.getQuotesManyExactOut);
+
+      for (const r of swap!.route) {
+        expect(r.route.input.equals(USDC)).toBeTruthy();
+        expect(r.route.output.equals(WETH.wrapped)).toBeTruthy();
+      }
+
+      console.log(swap);
+
+      expect(swap!.quote.currency.equals(WETH)).toBeTruthy();
+      expect(swap!.quoteGasAdjusted.currency.equals(WETH)).toBeTruthy();
+      expect(swap!.quote.greaterThan(swap!.quoteGasAdjusted)).toBeTruthy();
+      expect(swap!.estimatedGasUsed.toString()).toEqual('10000');
+      expect(
+        swap!.estimatedGasUsedQuoteToken.currency.equals(WETH)
+      ).toBeTruthy();
+      expect(
+        swap!.estimatedGasUsedUSD.currency.equals(USDC) ||
+          swap!.estimatedGasUsedUSD.currency.equals(DAI)
+      ).toBeTruthy();
+      expect(swap!.gasPriceWei.toString()).toEqual(
+        mockGasPriceWeiBN.toString()
+      );
+      // expect(swap!.route).toHaveLength(2);
+
+      expect(
+        _.filter(swap!.route, (r) => r.protocol == Protocol.V3)
+      ).toHaveLength(1);
+
+      // expect(
+      //   _(swap!.route)
+      //     .map((r) => r.percent)
+      //     .sum()
+      // ).toEqual(100);
+
+      // expect(sumFn(_.map(swap!.route, (r) => r.amount)).equalTo(amount));
+
+      // expect(swap!.trade).toBeDefined();
+      // expect(swap!.methodParameters).not.toBeDefined();
+      // expect(swap!.blockNumber.toString()).toEqual(mockBlockBN.toString());
     });
   });
 });
