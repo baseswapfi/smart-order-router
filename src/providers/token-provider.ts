@@ -50,7 +50,15 @@ export const USDbC_BASE = new Token(
   'USD Base Coin'
 );
 
-// Native
+export const WBTC_BASE = new Token(
+  ChainId.BASE,
+  '0x1a35EE4640b0A3B87705B0A4B45D227Ba60Ca2ad',
+  8,
+  'axlWBTC',
+  'Axelar Wrapped Bitcoin'
+);
+
+// Native USDC
 export const USDC_BASE = new Token(ChainId.BASE, '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', 6, 'USDC', 'USD Coin');
 
 // Base Goerli Tokens

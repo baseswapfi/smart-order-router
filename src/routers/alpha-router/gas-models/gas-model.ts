@@ -5,51 +5,55 @@ import { Pool } from '@baseswapfi/v3-sdk2';
 import { ProviderConfig } from '../../../providers/provider';
 import { DAI_BASE, USDC_BASE, USDbC_BASE } from '../../../providers/token-provider';
 import { IV2PoolProvider } from '../../../providers/v2/pool-provider';
-import { ArbitrumGasData, IL2GasDataProvider, OptimismGasData } from '../../../providers/v3/gas-data-provider';
+import {
+	ArbitrumGasData,
+	IL2GasDataProvider,
+	OptimismGasData,
+} from '../../../providers/v3/gas-data-provider';
 import { CurrencyAmount } from '../../../util/amounts';
 import {
-  MixedRouteWithValidQuote,
-  RouteWithValidQuote,
-  V2RouteWithValidQuote,
-  V3RouteWithValidQuote,
+	MixedRouteWithValidQuote,
+	RouteWithValidQuote,
+	V2RouteWithValidQuote,
+	V3RouteWithValidQuote,
 } from '../entities/route-with-valid-quote';
 
-// When adding new usd gas tokens, ensure the tokens are ordered
+// @note When adding new usd gas tokens, ensure the tokens are ordered
 // from tokens with highest decimals to lowest decimals. For example,
 // DAI_AVAX has 18 decimals and comes before USDC_AVAX which has 6 decimals.
 export const usdGasTokensByChain: { [chainId in ChainId]?: Token[] } = {
-  [ChainId.BASE]: [DAI_BASE, USDbC_BASE, USDC_BASE],
+	[ChainId.BASE]: [DAI_BASE, USDbC_BASE, USDC_BASE], // Decimal descending order
 };
 
 export type L1ToL2GasCosts = {
-  gasUsedL1: BigNumber;
-  gasCostL1USD: CurrencyAmount;
-  gasCostL1QuoteToken: CurrencyAmount;
+	gasUsedL1: BigNumber;
+	gasCostL1USD: CurrencyAmount;
+	gasCostL1QuoteToken: CurrencyAmount;
 };
 
 export type BuildOnChainGasModelFactoryType = {
-  chainId: ChainId;
-  gasPriceWei: BigNumber;
-  pools: LiquidityCalculationPools;
-  amountToken: Token;
-  quoteToken: Token;
-  v2poolProvider: IV2PoolProvider;
-  l2GasDataProvider?: IL2GasDataProvider<OptimismGasData> | IL2GasDataProvider<ArbitrumGasData>;
-  providerConfig?: ProviderConfig;
+	chainId: ChainId;
+	gasPriceWei: BigNumber;
+	pools: LiquidityCalculationPools;
+	amountToken: Token;
+	quoteToken: Token;
+	v2poolProvider: IV2PoolProvider;
+	l2GasDataProvider?: IL2GasDataProvider<OptimismGasData> | IL2GasDataProvider<ArbitrumGasData>;
+	providerConfig?: ProviderConfig;
 };
 
 export type BuildV2GasModelFactoryType = {
-  chainId: ChainId;
-  gasPriceWei: BigNumber;
-  poolProvider: IV2PoolProvider;
-  token: Token;
-  providerConfig?: ProviderConfig;
+	chainId: ChainId;
+	gasPriceWei: BigNumber;
+	poolProvider: IV2PoolProvider;
+	token: Token;
+	providerConfig?: ProviderConfig;
 };
 
 export type LiquidityCalculationPools = {
-  usdPool: Pool;
-  nativeQuoteTokenV3Pool: Pool | null;
-  nativeAmountTokenV3Pool: Pool | null;
+	usdPool: Pool;
+	nativeQuoteTokenV3Pool: Pool | null;
+	nativeAmountTokenV3Pool: Pool | null;
 };
 
 /**
@@ -69,12 +73,12 @@ export type LiquidityCalculationPools = {
  * long running operations.
  */
 export type IGasModel<TRouteWithValidQuote extends RouteWithValidQuote> = {
-  estimateGasCost(routeWithValidQuote: TRouteWithValidQuote): {
-    gasEstimate: BigNumber;
-    gasCostInToken: CurrencyAmount;
-    gasCostInUSD: CurrencyAmount;
-  };
-  calculateL1GasFees?(routes: TRouteWithValidQuote[]): Promise<L1ToL2GasCosts>;
+	estimateGasCost(routeWithValidQuote: TRouteWithValidQuote): {
+		gasEstimate: BigNumber;
+		gasCostInToken: CurrencyAmount;
+		gasCostInUSD: CurrencyAmount;
+	};
+	calculateL1GasFees?(routes: TRouteWithValidQuote[]): Promise<L1ToL2GasCosts>;
 };
 
 /**
@@ -89,13 +93,13 @@ export type IGasModel<TRouteWithValidQuote extends RouteWithValidQuote> = {
  * @class IV2GasModelFactory
  */
 export abstract class IV2GasModelFactory {
-  public abstract buildGasModel({
-    chainId,
-    gasPriceWei,
-    poolProvider,
-    token,
-    providerConfig,
-  }: BuildV2GasModelFactoryType): Promise<IGasModel<V2RouteWithValidQuote>>;
+	public abstract buildGasModel({
+		chainId,
+		gasPriceWei,
+		poolProvider,
+		token,
+		providerConfig,
+	}: BuildV2GasModelFactoryType): Promise<IGasModel<V2RouteWithValidQuote>>;
 }
 
 /**
@@ -110,14 +114,16 @@ export abstract class IV2GasModelFactory {
  * @class IOnChainGasModelFactory
  */
 export abstract class IOnChainGasModelFactory {
-  public abstract buildGasModel({
-    chainId,
-    gasPriceWei,
-    pools,
-    amountToken,
-    quoteToken,
-    v2poolProvider,
-    l2GasDataProvider,
-    providerConfig,
-  }: BuildOnChainGasModelFactoryType): Promise<IGasModel<V3RouteWithValidQuote | MixedRouteWithValidQuote>>;
+	public abstract buildGasModel({
+		chainId,
+		gasPriceWei,
+		pools,
+		amountToken,
+		quoteToken,
+		v2poolProvider,
+		l2GasDataProvider,
+		providerConfig,
+	}: BuildOnChainGasModelFactoryType): Promise<
+		IGasModel<V3RouteWithValidQuote | MixedRouteWithValidQuote>
+	>;
 }
