@@ -58,7 +58,10 @@ import {
 } from '../../providers/portion-provider';
 import { ProviderConfig } from '../../providers/provider';
 import { ITokenProvider, TokenProvider } from '../../providers/token-provider';
-import { ITokenValidatorProvider } from '../../providers/token-validator-provider';
+import {
+  ITokenValidatorProvider,
+  // TokenValidatorProvider,
+} from '../../providers/token-validator-provider';
 import {
   IV2PoolProvider,
   V2PoolProvider,
@@ -137,7 +140,7 @@ import { V2HeuristicGasModelFactory } from './gas-models/v2/v2-heuristic-gas-mod
 import { NATIVE_OVERHEAD } from './gas-models/v3/gas-costs';
 import { V3HeuristicGasModelFactory } from './gas-models/v3/v3-heuristic-gas-model';
 import { GetQuotesResult, MixedQuoter, V2Quoter, V3Quoter } from './quoters';
-import { OnChainTokenFeeFetcher } from '../../providers/token-fee-fetcher';
+// import { OnChainTokenFeeFetcher } from '../../providers/token-fee-fetcher';
 
 export type AlphaRouterParams = {
   /**
@@ -569,30 +572,22 @@ export class AlphaRouter
     if (tokenValidatorProvider) {
       this.tokenValidatorProvider = tokenValidatorProvider;
     }
+    // else {
+    //   this.tokenValidatorProvider = new TokenValidatorProvider(
+    //     this.chainId,
+    //     this.multicall2Provider,
+    //     new NodeJSCache(new NodeCache({ stdTTL: 30000, useClones: false }))
+    //   );
+    // }
 
     if (tokenPropertiesProvider) {
       this.tokenPropertiesProvider = tokenPropertiesProvider;
     } else {
       this.tokenPropertiesProvider = new TokenPropertiesProvider(
-        this.chainId,
-        this.tokenValidatorProvider!,
-        new NodeJSCache(new NodeCache({ stdTTL: 86400, useClones: false })),
-        new OnChainTokenFeeFetcher(this.chainId, provider)
-      );
-    }
-
-    if (tokenValidatorProvider) {
-      this.tokenValidatorProvider = tokenValidatorProvider;
-    }
-
-    if (tokenPropertiesProvider) {
-      this.tokenPropertiesProvider = tokenPropertiesProvider;
-    } else {
-      this.tokenPropertiesProvider = new TokenPropertiesProvider(
-        this.chainId,
-        this.tokenValidatorProvider!,
-        new NodeJSCache(new NodeCache({ stdTTL: 86400, useClones: false })),
-        new OnChainTokenFeeFetcher(this.chainId, provider)
+        // this.chainId,
+        // this.tokenValidatorProvider!,
+        new NodeJSCache(new NodeCache({ stdTTL: 86400, useClones: false }))
+        // new OnChainTokenFeeFetcher(this.chainId, provider)
       );
     }
 

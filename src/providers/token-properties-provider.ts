@@ -1,10 +1,19 @@
-import { ChainId, Token } from '@baseswapfi/sdk-core';
+import { Token } from '@baseswapfi/sdk-core';
 
-import { log, metric, MetricLoggerUnit } from '../util';
+import { metric, MetricLoggerUnit } from '../util';
 import { ICache } from './cache';
 import { ProviderConfig } from './provider';
-import { DEFAULT_TOKEN_FEE_RESULT, ITokenFeeFetcher, TokenFeeMap, TokenFeeResult } from './token-fee-fetcher';
-import { DEFAULT_ALLOWLIST, ITokenValidatorProvider, TokenValidationResult } from './token-validator-provider';
+import {
+  DEFAULT_TOKEN_FEE_RESULT,
+  // ITokenFeeFetcher,
+  // TokenFeeMap,
+  TokenFeeResult,
+} from './token-fee-fetcher';
+import {
+  // DEFAULT_ALLOWLIST,
+  // ITokenValidatorProvider,
+  TokenValidationResult,
+} from './token-validator-provider';
 import { BigNumber } from '@ethersproject/bignumber';
 
 export const DEFAULT_TOKEN_PROPERTIES_RESULT: TokenPropertiesResult = {
@@ -19,55 +28,73 @@ export type TokenPropertiesResult = {
 export type TokenPropertiesMap = Record<Address, TokenPropertiesResult>;
 
 export interface ITokenPropertiesProvider {
-  getTokensProperties(tokens: Token[], providerConfig?: ProviderConfig): Promise<TokenPropertiesMap>;
+  getTokensProperties(
+    tokens: Token[],
+    providerConfig?: ProviderConfig
+  ): Promise<TokenPropertiesMap>;
 }
 
 export class TokenPropertiesProvider implements ITokenPropertiesProvider {
-  private CACHE_KEY = (chainId: ChainId, address: string) => `token-properties-${chainId}-${address}`;
+  // private CACHE_KEY = (chainId: ChainId, address: string) =>
+  //   `token-properties-${chainId}-${address}`;
 
   constructor(
-    private chainId: ChainId,
-    private tokenValidatorProvider: ITokenValidatorProvider,
-    private tokenPropertiesCache: ICache<TokenPropertiesResult>,
-    private tokenFeeFetcher: ITokenFeeFetcher,
-    private allowList = DEFAULT_ALLOWLIST
-  ) {}
+    // private chainId: ChainId,
+    // private tokenValidatorProvider: ITokenValidatorProvider,
+    private tokenPropertiesCache: ICache<TokenPropertiesResult>
+  ) // private tokenFeeFetcher: ITokenFeeFetcher,
+  // private allowList = DEFAULT_ALLOWLIST
+  {}
 
-  public async getTokensProperties(tokens: Token[], providerConfig?: ProviderConfig): Promise<TokenPropertiesMap> {
+  public async getTokensProperties(
+    tokens: Token[],
+    providerConfig?: ProviderConfig
+  ): Promise<TokenPropertiesMap> {
     const tokenToResult: TokenPropertiesMap = {};
 
     if (!providerConfig?.enableFeeOnTransferFeeFetching) {
       return tokenToResult;
     }
 
-    const nonAllowlistTokens = tokens.filter((token) => !this.allowList.has(token.address.toLowerCase()));
-    const tokenValidationResults = await this.tokenValidatorProvider.validateTokens(nonAllowlistTokens, providerConfig);
+    // const nonAllowlistTokens = tokens.filter((token) => !this.allowList.has(token.address.toLowerCase()));
+    // const tokenValidationResults = await this.tokenValidatorProvider.validateTokens(nonAllowlistTokens, providerConfig);
 
     tokens.forEach((token) => {
-      if (this.allowList.has(token.address.toLowerCase())) {
-        // if the token is in the allowlist, make it UNKNOWN so that we don't fetch the FOT fee on-chain
-        tokenToResult[token.address.toLowerCase()] = {
-          tokenValidationResult: TokenValidationResult.UNKN,
-        };
-      } else {
-        tokenToResult[token.address.toLowerCase()] = {
-          tokenValidationResult: tokenValidationResults.getValidationByToken(token),
-        };
-      }
+      tokenToResult[token.address.toLowerCase()] = {
+        tokenValidationResult: TokenValidationResult.UNKN,
+      };
+
+      // if (this.allowList.has(token.address.toLowerCase())) {
+      //   // if the token is in the allowlist, make it UNKNOWN so that we don't fetch the FOT fee on-chain
+      //   tokenToResult[token.address.toLowerCase()] = {
+      //     tokenValidationResult: TokenValidationResult.UNKN,
+      //   };
+      // } else {
+      //   tokenToResult[token.address.toLowerCase()] = {
+      //     tokenValidationResult: tokenValidationResults.getValidationByToken(token),
+      //   };
+      // }
     });
 
-    const addressesToFetchFeesOnchain: string[] = [];
+    // const addressesToFetchFeesOnchain: string[] = [];
     const addressesRaw = this.buildAddressesRaw(tokens);
 
-    const tokenProperties = await this.tokenPropertiesCache.batchGet(addressesRaw);
+    const tokenProperties = await this.tokenPropertiesCache.batchGet(
+      addressesRaw
+    );
 
     // Check if we have cached token validation results for any tokens.
     for (const address of addressesRaw) {
       const cachedValue = tokenProperties[address];
       if (cachedValue) {
-        metric.putMetric('TokenPropertiesProviderBatchGetCacheHit', 1, MetricLoggerUnit.Count);
+        metric.putMetric(
+          'TokenPropertiesProviderBatchGetCacheHit',
+          1,
+          MetricLoggerUnit.Count
+        );
         const tokenFee = cachedValue.tokenFeeResult;
-        const tokenFeeResultExists: BigNumber | undefined = tokenFee && (tokenFee.buyFeeBps || tokenFee.sellFeeBps);
+        const tokenFeeResultExists: BigNumber | undefined =
+          tokenFee && (tokenFee.buyFeeBps || tokenFee.sellFeeBps);
 
         if (tokenFeeResultExists) {
           metric.putMetric(
@@ -76,61 +103,87 @@ export class TokenPropertiesProvider implements ITokenPropertiesProvider {
             MetricLoggerUnit.Count
           );
         } else {
-          metric.putMetric(`TokenPropertiesProviderCacheHitTokenFeeResultNotExists`, 1, MetricLoggerUnit.Count);
+          metric.putMetric(
+            `TokenPropertiesProviderCacheHitTokenFeeResultNotExists`,
+            1,
+            MetricLoggerUnit.Count
+          );
         }
 
         tokenToResult[address] = cachedValue;
-      } else if (tokenToResult[address]?.tokenValidationResult === TokenValidationResult.FOT) {
-        addressesToFetchFeesOnchain.push(address);
       }
+      // else if (
+      //   tokenToResult[address]?.tokenValidationResult ===
+      //   TokenValidationResult.FOT
+      // ) {
+      //   addressesToFetchFeesOnchain.push(address);
+      // }
     }
 
-    if (addressesToFetchFeesOnchain.length > 0) {
-      let tokenFeeMap: TokenFeeMap = {};
+    // if (addressesToFetchFeesOnchain.length > 0) {
+    //   let tokenFeeMap: TokenFeeMap = {};
 
-      try {
-        tokenFeeMap = await this.tokenFeeFetcher.fetchFees(addressesToFetchFeesOnchain, providerConfig);
-      } catch (err) {
-        log.error({ err }, `Error fetching fees for tokens ${addressesToFetchFeesOnchain}`);
-      }
+    //   try {
+    //     tokenFeeMap = await this.tokenFeeFetcher.fetchFees(
+    //       addressesToFetchFeesOnchain,
+    //       providerConfig
+    //     );
+    //   } catch (err) {
+    //     log.error(
+    //       { err },
+    //       `Error fetching fees for tokens ${addressesToFetchFeesOnchain}`
+    //     );
+    //   }
 
-      await Promise.all(
-        addressesToFetchFeesOnchain.map((address) => {
-          const tokenFee = tokenFeeMap[address];
-          const tokenFeeResultExists: BigNumber | undefined = tokenFee && (tokenFee.buyFeeBps || tokenFee.sellFeeBps);
+    //   await Promise.all(
+    //     addressesToFetchFeesOnchain.map((address) => {
+    //       const tokenFee = tokenFeeMap[address];
+    //       const tokenFeeResultExists: BigNumber | undefined =
+    //         tokenFee && (tokenFee.buyFeeBps || tokenFee.sellFeeBps);
 
-          if (tokenFeeResultExists) {
-            // we will leverage the metric to log the token fee result, if it exists
-            // the idea is that the token fee should not differ by too much across tokens,
-            // so that we can accurately log the token fee for a particular quote request (without breaching metrics dimensionality limit)
-            // in the form of metrics.
-            // if we log as logging, given prod traffic volume, the logging volume will be high.
-            metric.putMetric(
-              `TokenPropertiesProviderTokenFeeResultCacheMissExists${tokenFeeResultExists}`,
-              1,
-              MetricLoggerUnit.Count
-            );
-            const tokenResultForAddress = tokenToResult[address];
+    //       if (tokenFeeResultExists) {
+    //         // we will leverage the metric to log the token fee result, if it exists
+    //         // the idea is that the token fee should not differ by too much across tokens,
+    //         // so that we can accurately log the token fee for a particular quote request (without breaching metrics dimensionality limit)
+    //         // in the form of metrics.
+    //         // if we log as logging, given prod traffic volume, the logging volume will be high.
+    //         metric.putMetric(
+    //           `TokenPropertiesProviderTokenFeeResultCacheMissExists${tokenFeeResultExists}`,
+    //           1,
+    //           MetricLoggerUnit.Count
+    //         );
+    //         const tokenResultForAddress = tokenToResult[address];
 
-            if (tokenResultForAddress) {
-              tokenResultForAddress.tokenFeeResult = tokenFee;
-            }
+    //         if (tokenResultForAddress) {
+    //           tokenResultForAddress.tokenFeeResult = tokenFee;
+    //         }
 
-            metric.putMetric('TokenPropertiesProviderBatchGetCacheMiss', 1, MetricLoggerUnit.Count);
+    //         metric.putMetric(
+    //           'TokenPropertiesProviderBatchGetCacheMiss',
+    //           1,
+    //           MetricLoggerUnit.Count
+    //         );
 
-            // update cache concurrently
-            // at this point, we are confident that the tokens are FOT, so we can hardcode the validation result
-            return this.tokenPropertiesCache.set(this.CACHE_KEY(this.chainId, address), {
-              tokenFeeResult: tokenFee,
-              tokenValidationResult: TokenValidationResult.FOT,
-            });
-          } else {
-            metric.putMetric(`TokenPropertiesProviderTokenFeeResultCacheMissNotExists`, 1, MetricLoggerUnit.Count);
-            return Promise.resolve(true);
-          }
-        })
-      );
-    }
+    //         // update cache concurrently
+    //         // at this point, we are confident that the tokens are FOT, so we can hardcode the validation result
+    //         return this.tokenPropertiesCache.set(
+    //           this.CACHE_KEY(this.chainId, address),
+    //           {
+    //             tokenFeeResult: tokenFee,
+    //             tokenValidationResult: TokenValidationResult.FOT,
+    //           }
+    //         );
+    //       } else {
+    //         metric.putMetric(
+    //           `TokenPropertiesProviderTokenFeeResultCacheMissNotExists`,
+    //           1,
+    //           MetricLoggerUnit.Count
+    //         );
+    //         return Promise.resolve(true);
+    //       }
+    //     })
+    //   );
+    // }
 
     return tokenToResult;
   }
