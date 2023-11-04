@@ -4,6 +4,7 @@ import { Protocol } from '@baseswapfi/router-sdk';
 import { ChainId, Fraction, TradeType } from '@baseswapfi/sdk-core';
 import { Pair } from '@baseswapfi/v2-sdk';
 import { encodeSqrtRatioX96, Pool } from '@baseswapfi/v3-sdk2';
+import DEFAULT_TOKEN_LIST from '../../../../src/baseswap-default.tokenlist.json';
 // import JSBI from 'jsbi';
 import _ from 'lodash';
 import sinon from 'sinon';
@@ -464,6 +465,7 @@ describe('alpha router', () => {
       simulator: mockFallbackTenderlySimulator,
       routeCachingProvider: inMemoryRouteCachingProvider,
       tokenPropertiesProvider: mockTokenPropertiesProvider,
+      defaultTokenList: DEFAULT_TOKEN_LIST,
     });
   });
 

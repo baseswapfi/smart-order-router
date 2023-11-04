@@ -1,6 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { BaseProvider, JsonRpcProvider } from '@ethersproject/providers';
-import DEFAULT_TOKEN_LIST from '../../baseswap-default.tokenlist.json';
+// import DEFAULT_TOKEN_LIST from '../../baseswap-default.tokenlist.json';
 import { Protocol, SwapRouter, Trade, ZERO } from '@baseswapfi/router-sdk';
 import {
   ChainId,
@@ -248,6 +248,8 @@ export type AlphaRouterParams = {
    * A provider for computing the portion-related data for routes and quotes.
    */
   portionProvider?: IPortionProvider;
+
+  defaultTokenList: TokenList;
 };
 
 export class MapWithLowerCaseKey<V> extends Map<string, V> {
@@ -452,6 +454,7 @@ export class AlphaRouter
     routeCachingProvider,
     tokenPropertiesProvider,
     portionProvider,
+    defaultTokenList,
   }: AlphaRouterParams) {
     this.chainId = chainId;
     this.provider = provider;
@@ -621,7 +624,7 @@ export class AlphaRouter
         new NodeJSCache(new NodeCache({ stdTTL: 3600, useClones: false })),
         new CachingTokenListProvider(
           chainId,
-          DEFAULT_TOKEN_LIST,
+          defaultTokenList,
           new NodeJSCache(new NodeCache({ stdTTL: 3600, useClones: false }))
         ),
         new TokenProvider(chainId, this.multicall2Provider)
