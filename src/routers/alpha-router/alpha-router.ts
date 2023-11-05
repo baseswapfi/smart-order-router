@@ -1,6 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { BaseProvider, JsonRpcProvider } from '@ethersproject/providers';
-import DEFAULT_TOKEN_LIST from '../../baseswap-default.tokenlist.json';
+import DEFAULT_TOKEN_LIST from '@baseswapfi/default-token-list';
 import { Protocol, SwapRouter, Trade } from '@baseswapfi/router-sdk';
 import { ChainId, Currency, Fraction, Token, TradeType } from '@baseswapfi/sdk-core';
 import { TokenList } from '@uniswap/token-lists';
@@ -519,26 +519,9 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
         new TokenProvider(chainId, this.multicall2Provider)
       );
 
-    // const chainName = ID_TO_NETWORK_NAME(chainId);
-
-    // ipfs urls in the following format: `https://cloudflare-ipfs.com/ipns/api.uniswap.org/v1/pools/${protocol}/${chainName}.json`;
     if (v2SubgraphProvider) {
       this.v2SubgraphProvider = v2SubgraphProvider;
     } else {
-      // this.v2SubgraphProvider = new V2SubgraphProviderWithFallBacks([
-      //   new CachingV2SubgraphProvider(
-      //     chainId,
-      //     new URISubgraphProvider(
-      //       chainId,
-      //       `https://cloudflare-ipfs.com/ipns/api.uniswap.org/v1/pools/v2/${chainName}.json`, // TODO: If we needed to use V2
-      //       undefined,
-      //       0
-      //     ),
-      //     new NodeJSCache(new NodeCache({ stdTTL: 300, useClones: false }))
-      //   ),
-      //   new StaticV2SubgraphProvider(chainId),
-      // ]);
-
       // Overrides Uni to use our subgraph for the current chain (or throws for invalid chains)
       this.v2SubgraphProvider = new CachingV2SubgraphProvider(
         this.chainId,
@@ -550,19 +533,6 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     if (v3SubgraphProvider) {
       this.v3SubgraphProvider = v3SubgraphProvider;
     } else {
-      // this.v3SubgraphProvider = new V3SubgraphProviderWithFallBacks([
-      //   new CachingV3SubgraphProvider(
-      //     chainId,
-      //     new URISubgraphProvider(
-      //       chainId,
-      //       `https://cloudflare-ipfs.com/ipns/api.uniswap.org/v1/pools/v3/${chainName}.json`,
-      //       undefined,
-      //       0
-      //     ),
-      //     new NodeJSCache(new NodeCache({ stdTTL: 300, useClones: false }))
-      //   ),
-      //   new StaticV3SubgraphProvider(chainId, this.v3PoolProvider),
-      // ]);
       // Overrides Uni to use our subgraph for the current chain (or throws for invalid chains)
       this.v3SubgraphProvider = new CachingV3SubgraphProvider(
         this.chainId,

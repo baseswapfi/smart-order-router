@@ -1,6 +1,6 @@
 {
   "name": "@baseswapfi/smart-order-router",
-  "version": "3.15.36",
+  "version": "3.15.37",
   "description": "Uniswap Smart Order Router",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
@@ -26,6 +26,7 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
+    "@baseswapfi/default-token-list": "^1.0.2",
     "@baseswapfi/router-sdk": "^1.0.25",
     "@baseswapfi/sdk-core": "^1.0.27",
     "@baseswapfi/universal-router-sdk": "^1.5.34",
