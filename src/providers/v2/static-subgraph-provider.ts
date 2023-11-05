@@ -38,6 +38,7 @@ const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
   [ChainId.BASE_GOERLI]: [],
   [ChainId.BASE]: [USDC_BASE, WRAPPED_NATIVE_CURRENCY[ChainId.BASE]],
   [ChainId.SCROLL_SEPOLIA]: [],
+  [ChainId.SCROLL]: [],
 };
 
 /**

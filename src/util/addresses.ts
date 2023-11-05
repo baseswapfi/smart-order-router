@@ -18,8 +18,9 @@ export const QUOTER_V2_ADDRESSES: AddressMap = {
   [ChainId.BASE]: CHAIN_TO_ADDRESSES_MAP[ChainId.BASE].quoterAddress,
 };
 
-// TODO: Checkout the mixed routing thing. Relevant for our setup now
-export const MIXED_ROUTE_QUOTER_V1_ADDRESSES: AddressMap = {};
+export const MIXED_ROUTE_QUOTER_V1_ADDRESSES: AddressMap = {
+  [ChainId.BASE_GOERLI]: CHAIN_TO_ADDRESSES_MAP[ChainId.BASE_GOERLI].v1MixedRouteQuoterAddress,
+};
 
 export const UNISWAP_MULTICALL_ADDRESSES: AddressMap = {
   [ChainId.BASE_GOERLI]: CHAIN_TO_ADDRESSES_MAP[ChainId.BASE_GOERLI].multicallAddress,
@@ -49,6 +50,13 @@ export const WETH9: {
     'Wrapped Ether'
   ),
   [ChainId.BASE]: new Token(ChainId.BASE, '0x4200000000000000000000000000000000000006', 18, 'WETH', 'Wrapped Ether'),
+  [ChainId.SCROLL]: new Token(
+    ChainId.SCROLL,
+    '0x5300000000000000000000000000000000000004',
+    18,
+    'WETH',
+    'Wrapped Ether'
+  ),
   [ChainId.SCROLL_SEPOLIA]: new Token(
     ChainId.SCROLL_SEPOLIA,
     '0x5300000000000000000000000000000000000004',

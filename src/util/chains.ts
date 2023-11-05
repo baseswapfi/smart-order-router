@@ -93,6 +93,13 @@ export const WRAPPED_NATIVE_CURRENCY: { [chainId in ChainId]: Token } = {
     'WETH',
     'Wrapped Ether'
   ),
+  [ChainId.SCROLL]: new Token(
+    ChainId.SCROLL,
+    '0x5300000000000000000000000000000000000004',
+    18,
+    'WETH',
+    'Wrapped Ether'
+  ),
   [ChainId.SCROLL_SEPOLIA]: new Token(
     ChainId.SCROLL_SEPOLIA,
     '0x5300000000000000000000000000000000000004',
