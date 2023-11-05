@@ -1256,9 +1256,7 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     const v2ProtocolSpecified = protocols.includes(Protocol.V2);
     const v2SupportedInChain = V2_SUPPORTED.includes(this.chainId);
     const shouldQueryMixedProtocol = protocols.includes(Protocol.MIXED) || (noProtocolsSpecified && v2SupportedInChain);
-    // const mixedProtocolAllowed =
-    //   [ChainId.MAINNET, ChainId.GOERLI].includes(this.chainId) && tradeType === TradeType.EXACT_INPUT;
-    const mixedProtocolAllowed = false;
+    const mixedProtocolAllowed = V2_SUPPORTED.includes(this.chainId) && tradeType === TradeType.EXACT_INPUT;
 
     const quotePromises: Promise<GetQuotesResult>[] = [];
 
