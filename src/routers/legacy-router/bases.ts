@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ChainId, Token } from '@baseswapfi/sdk-core';
 
-import { ITokenProvider, USDC_BASE, DAI_BASE } from '../../providers/token-provider';
+import { ITokenProvider, USDC_BASE, DAI_BASE, USDC_BASE_GOERLI } from '../../providers/token-provider';
 import { WRAPPED_NATIVE_CURRENCY } from '../../util/chains';
 
 type ChainTokenList = {
@@ -12,7 +12,7 @@ export const BASES_TO_CHECK_TRADES_AGAINST = (_tokenProvider: ITokenProvider): C
   return {
     [ChainId.OPTIMISM]: [WRAPPED_NATIVE_CURRENCY[ChainId.OPTIMISM]!],
     [ChainId.BASE]: [WRAPPED_NATIVE_CURRENCY[ChainId.BASE]!, USDC_BASE, DAI_BASE],
-    [ChainId.BASE_GOERLI]: [WRAPPED_NATIVE_CURRENCY[ChainId.BASE_GOERLI]!],
+    [ChainId.BASE_GOERLI]: [WRAPPED_NATIVE_CURRENCY[ChainId.BASE_GOERLI]!, USDC_BASE_GOERLI],
     [ChainId.SCROLL_SEPOLIA]: [WRAPPED_NATIVE_CURRENCY[ChainId.SCROLL_SEPOLIA]],
     [ChainId.SCROLL]: [WRAPPED_NATIVE_CURRENCY[ChainId.SCROLL]],
   };

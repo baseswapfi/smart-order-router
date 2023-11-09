@@ -1,4 +1,4 @@
-import { ChainId, Token } from '@baseswapfi/sdk-core';
+import { ChainId, SUBGRAPH_URL_MAP, Token } from '@baseswapfi/sdk-core';
 import retry from 'async-retry';
 import Timeout from 'await-timeout';
 import { gql, GraphQLClient } from 'graphql-request';
@@ -42,10 +42,6 @@ export const printV3SubgraphPool = (s: V3SubgraphPool) => `${s.token0.id}/${s.to
 
 export const printV2SubgraphPool = (s: V2SubgraphPool) => `${s.token0.id}/${s.token1.id}`;
 
-const SUBGRAPH_URL_BY_CHAIN: { [chainId in ChainId]?: string } = {
-  [ChainId.BASE]: 'https://api.thegraph.com/subgraphs/name/baseswapfi/v3-base',
-};
-
 const PAGE_SIZE = 1000; // 1k is max possible query size from subgraph.
 
 /**
@@ -62,7 +58,8 @@ export class V3SubgraphProvider implements IV3SubgraphProvider {
   private client: GraphQLClient;
 
   constructor(private chainId: ChainId, private retries = 2, private timeout = 30000, private rollback = true) {
-    const subgraphUrl = SUBGRAPH_URL_BY_CHAIN[this.chainId];
+    // @ts-ignore
+    const subgraphUrl = SUBGRAPH_URL_MAP[this.chainId];
     if (!subgraphUrl) {
       throw new Error(`No subgraph url for chain id: ${this.chainId}`);
     }

@@ -1,4 +1,4 @@
-import { ChainId, Token } from '@baseswapfi/sdk-core';
+import { ChainId, Token, V2_SUBGRAPH_URL_MAP } from '@baseswapfi/sdk-core';
 import retry from 'async-retry';
 import Timeout from 'await-timeout';
 import { gql, GraphQLClient } from 'graphql-request';
@@ -35,10 +35,6 @@ type RawV2SubgraphPool = {
   reserveUSD: string;
 };
 
-const V2_SUBGRAPH_URL_BY_CHAIN: { [chainId in ChainId]?: string } = {
-  [ChainId.BASE]: 'https://api.thegraph.com/subgraphs/name/harleen-m/baseswap',
-};
-
 const threshold = 0.025;
 
 const PAGE_SIZE = 1000; // 1k is max possible query size from subgraph.
@@ -63,7 +59,8 @@ export class V2SubgraphProvider implements IV2SubgraphProvider {
     private rollback = true,
     private pageSize = PAGE_SIZE
   ) {
-    const subgraphUrl = V2_SUBGRAPH_URL_BY_CHAIN[this.chainId];
+    // @ts-ignore
+    const subgraphUrl = V2_SUBGRAPH_URL_MAP[this.chainId];
     if (!subgraphUrl) {
       throw new Error(`No subgraph url for chain id: ${this.chainId}`);
     }

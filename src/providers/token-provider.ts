@@ -50,21 +50,21 @@ export const USDC_BASE = new Token(
   'USD Base Coin'
 );
 
-// Base Goerli Tokens
-export const USDC_BASE_GOERLI = new Token(
-  ChainId.BASE_GOERLI,
-  '0x853154e2A5604E5C74a2546E2871Ad44932eB92C',
-  6,
-  'USDbC',
-  'USD Base Coin'
-);
-
 export const DAI_BASE = new Token(
   ChainId.BASE,
   '0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb',
   18,
   'DAI',
   'DAI Stablecoin'
+);
+
+// Base Goerli Tokens
+export const USDC_BASE_GOERLI = new Token(
+  ChainId.BASE_GOERLI,
+  '0x7b4Adf64B0d60fF97D672E473420203D52562A84',
+  6,
+  'USDC',
+  'USD Coin'
 );
 
 export class TokenProvider implements ITokenProvider {

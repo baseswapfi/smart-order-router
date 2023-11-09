@@ -8,7 +8,7 @@ import { unparseFeeAmount } from '../../util/amounts';
 import { WRAPPED_NATIVE_CURRENCY } from '../../util/chains';
 import { log } from '../../util/log';
 import { ProviderConfig } from '../provider';
-import { USDC_BASE, USDC_OPTIMISM } from '../token-provider';
+import { USDC_BASE, USDC_BASE_GOERLI, USDC_OPTIMISM } from '../token-provider';
 
 import { IV3PoolProvider } from './pool-provider';
 import { IV3SubgraphProvider, V3SubgraphPool } from './subgraph-provider';
@@ -19,7 +19,7 @@ type ChainTokenList = {
 
 const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
   [ChainId.OPTIMISM]: [WRAPPED_NATIVE_CURRENCY[ChainId.OPTIMISM]!, USDC_OPTIMISM],
-  [ChainId.BASE_GOERLI]: [WRAPPED_NATIVE_CURRENCY[ChainId.BASE_GOERLI]],
+  [ChainId.BASE_GOERLI]: [WRAPPED_NATIVE_CURRENCY[ChainId.BASE_GOERLI], USDC_BASE_GOERLI],
   [ChainId.BASE]: [WRAPPED_NATIVE_CURRENCY[ChainId.BASE], USDC_BASE],
   [ChainId.SCROLL_SEPOLIA]: [WRAPPED_NATIVE_CURRENCY[ChainId.SCROLL_SEPOLIA]],
   [ChainId.SCROLL]: [WRAPPED_NATIVE_CURRENCY[ChainId.SCROLL]],

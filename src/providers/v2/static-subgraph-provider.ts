@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import { WRAPPED_NATIVE_CURRENCY } from '../../util/chains';
 import { log } from '../../util/log';
-import { USDC_BASE } from '../token-provider';
+import { USDC_BASE, USDC_BASE_GOERLI } from '../token-provider';
 
 import { IV2SubgraphProvider, V2SubgraphPool } from './subgraph-provider';
 
@@ -35,7 +35,7 @@ const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
   // [ChainId.MOONBEAM]: [],
   // [ChainId.BNB]: [],
   // [ChainId.AVALANCHE]: [],
-  [ChainId.BASE_GOERLI]: [],
+  [ChainId.BASE_GOERLI]: [USDC_BASE_GOERLI, WRAPPED_NATIVE_CURRENCY[ChainId.BASE_GOERLI]],
   [ChainId.BASE]: [USDC_BASE, WRAPPED_NATIVE_CURRENCY[ChainId.BASE]],
   [ChainId.SCROLL_SEPOLIA]: [],
   [ChainId.SCROLL]: [],

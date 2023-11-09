@@ -1,14 +1,8 @@
-import {
-  ChainId,
-  // Currency,
-  Ether,
-  NativeCurrency,
-  Token,
-} from '@baseswapfi/sdk-core';
+import { ChainId, Ether, NativeCurrency, Token } from '@baseswapfi/sdk-core';
 
-export const SUPPORTED_CHAINS: ChainId[] = [ChainId.BASE];
+export const SUPPORTED_CHAINS: ChainId[] = [ChainId.BASE, ChainId.BASE_GOERLI];
 
-export const V2_SUPPORTED = [ChainId.BASE];
+export const V2_SUPPORTED = [ChainId.BASE, ChainId.BASE_GOERLI];
 
 export const HAS_L1_FEE = [ChainId.BASE, ChainId.BASE_GOERLI];
 
