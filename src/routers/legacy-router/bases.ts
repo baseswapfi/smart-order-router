@@ -1,7 +1,17 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ChainId, Token } from '@baseswapfi/sdk-core';
 
-import { ITokenProvider, USDC_BASE, DAI_BASE, USDC_BASE_GOERLI, USDC_ARBITRUM } from '../../providers/token-provider';
+import {
+  ITokenProvider,
+  USDC_BASE,
+  DAI_BASE,
+  USDC_BASE_GOERLI,
+  USDC_ARBITRUM,
+  ARB_ARBITRUM,
+  DAI_ARBITRUM,
+  USDT_ARBITRUM,
+  WBTC_ARBITRUM,
+} from '../../providers/token-provider';
 import { WRAPPED_NATIVE_CURRENCY } from '../../util/chains';
 
 type ChainTokenList = {
@@ -15,7 +25,14 @@ export const BASES_TO_CHECK_TRADES_AGAINST = (_tokenProvider: ITokenProvider): C
     [ChainId.BASE_GOERLI]: [WRAPPED_NATIVE_CURRENCY[ChainId.BASE_GOERLI]!, USDC_BASE_GOERLI],
     [ChainId.SCROLL_SEPOLIA]: [WRAPPED_NATIVE_CURRENCY[ChainId.SCROLL_SEPOLIA]],
     [ChainId.SCROLL]: [WRAPPED_NATIVE_CURRENCY[ChainId.SCROLL]],
-    [ChainId.ARBITRUM]: [WRAPPED_NATIVE_CURRENCY[ChainId.ARBITRUM], USDC_ARBITRUM],
+    [ChainId.ARBITRUM]: [
+      WRAPPED_NATIVE_CURRENCY[ChainId.ARBITRUM],
+      WBTC_ARBITRUM,
+      DAI_ARBITRUM,
+      USDC_ARBITRUM,
+      USDT_ARBITRUM,
+      ARB_ARBITRUM,
+    ],
   };
 };
 

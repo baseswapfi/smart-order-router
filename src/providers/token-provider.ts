@@ -74,7 +74,36 @@ export const USDC_ARBITRUM = new Token(
   '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8',
   6,
   'USDC',
-  'USD Base Coin'
+  'USD//C'
+);
+export const USDT_ARBITRUM = new Token(
+  ChainId.ARBITRUM,
+  '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9',
+  6,
+  'USDT',
+  'Tether USD'
+);
+export const WBTC_ARBITRUM = new Token(
+  ChainId.ARBITRUM,
+  '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f',
+  8,
+  'WBTC',
+  'Wrapped BTC'
+);
+export const DAI_ARBITRUM = new Token(
+  ChainId.ARBITRUM,
+  '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1',
+  18,
+  'DAI',
+  'Dai Stablecoin'
+);
+
+export const ARB_ARBITRUM = new Token(
+  ChainId.ARBITRUM,
+  '0x912CE59144191C1204E64559FE8253a0e49E6548',
+  18,
+  'ARB',
+  'Arbitrum'
 );
 
 export class TokenProvider implements ITokenProvider {

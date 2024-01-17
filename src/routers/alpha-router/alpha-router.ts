@@ -49,6 +49,7 @@ import { ITokenValidatorProvider } from '../../providers/token-validator-provide
 import { IV2PoolProvider, V2PoolProvider } from '../../providers/v2/pool-provider';
 import {
   ArbitrumGasData,
+  ArbitrumGasDataProvider,
   IL2GasDataProvider,
   OptimismGasData,
   OptimismGasDataProvider,
@@ -377,6 +378,7 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     mixedRouteGasModelFactory,
     swapRouterProvider,
     optimismGasDataProvider,
+    arbitrumGasDataProvider,
     tokenValidatorProvider,
     simulator,
     routeCachingProvider,
@@ -568,9 +570,9 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
     if (chainId === ChainId.OPTIMISM || chainId === ChainId.BASE || chainId === ChainId.BASE_GOERLI) {
       this.l2GasDataProvider = optimismGasDataProvider ?? new OptimismGasDataProvider(chainId, this.multicall2Provider);
     }
-    // if (chainId === ChainId.ARBITRUM_ONE || chainId === ChainId.ARBITRUM_GOERLI) {
-    //   this.l2GasDataProvider = arbitrumGasDataProvider ?? new ArbitrumGasDataProvider(chainId, this.provider);
-    // }
+    if (chainId === ChainId.ARBITRUM) {
+      this.l2GasDataProvider = arbitrumGasDataProvider ?? new ArbitrumGasDataProvider(chainId, this.provider);
+    }
     if (tokenValidatorProvider) {
       this.tokenValidatorProvider = tokenValidatorProvider;
     }

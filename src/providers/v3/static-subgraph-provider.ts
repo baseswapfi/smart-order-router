@@ -8,7 +8,16 @@ import { unparseFeeAmount } from '../../util/amounts';
 import { WRAPPED_NATIVE_CURRENCY } from '../../util/chains';
 import { log } from '../../util/log';
 import { ProviderConfig } from '../provider';
-import { USDC_ARBITRUM, USDC_BASE, USDC_BASE_GOERLI, USDC_OPTIMISM } from '../token-provider';
+import {
+  ARB_ARBITRUM,
+  DAI_ARBITRUM,
+  USDC_ARBITRUM,
+  USDC_BASE,
+  USDC_BASE_GOERLI,
+  USDC_OPTIMISM,
+  USDT_ARBITRUM,
+  WBTC_ARBITRUM,
+} from '../token-provider';
 
 import { IV3PoolProvider } from './pool-provider';
 import { IV3SubgraphProvider, V3SubgraphPool } from './subgraph-provider';
@@ -23,7 +32,14 @@ const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
   [ChainId.BASE]: [WRAPPED_NATIVE_CURRENCY[ChainId.BASE], USDC_BASE],
   [ChainId.SCROLL_SEPOLIA]: [WRAPPED_NATIVE_CURRENCY[ChainId.SCROLL_SEPOLIA]],
   [ChainId.SCROLL]: [WRAPPED_NATIVE_CURRENCY[ChainId.SCROLL]],
-  [ChainId.ARBITRUM]: [WRAPPED_NATIVE_CURRENCY[ChainId.ARBITRUM], USDC_ARBITRUM],
+  [ChainId.ARBITRUM]: [
+    WRAPPED_NATIVE_CURRENCY[ChainId.ARBITRUM],
+    WBTC_ARBITRUM,
+    DAI_ARBITRUM,
+    USDC_ARBITRUM,
+    USDT_ARBITRUM,
+    ARB_ARBITRUM,
+  ],
 };
 
 /**

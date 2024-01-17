@@ -4,7 +4,15 @@ import _ from 'lodash';
 
 import { WRAPPED_NATIVE_CURRENCY } from '../../util/chains';
 import { log } from '../../util/log';
-import { USDC_ARBITRUM, USDC_BASE, USDC_BASE_GOERLI } from '../token-provider';
+import {
+  ARB_ARBITRUM,
+  DAI_ARBITRUM,
+  USDC_ARBITRUM,
+  USDC_BASE,
+  USDC_BASE_GOERLI,
+  USDT_ARBITRUM,
+  WBTC_ARBITRUM,
+} from '../token-provider';
 
 import { IV2SubgraphProvider, V2SubgraphPool } from './subgraph-provider';
 
@@ -18,7 +26,14 @@ const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
   [ChainId.BASE]: [USDC_BASE, WRAPPED_NATIVE_CURRENCY[ChainId.BASE]],
   [ChainId.SCROLL_SEPOLIA]: [],
   [ChainId.SCROLL]: [],
-  [ChainId.ARBITRUM]: [WRAPPED_NATIVE_CURRENCY[ChainId.ARBITRUM], USDC_ARBITRUM],
+  [ChainId.ARBITRUM]: [
+    WRAPPED_NATIVE_CURRENCY[ChainId.ARBITRUM],
+    WBTC_ARBITRUM,
+    DAI_ARBITRUM,
+    USDC_ARBITRUM,
+    USDT_ARBITRUM,
+    ARB_ARBITRUM,
+  ],
 };
 
 /**
