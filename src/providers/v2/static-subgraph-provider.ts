@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import { WRAPPED_NATIVE_CURRENCY } from '../../util/chains';
 import { log } from '../../util/log';
-import { USDC_BASE, USDC_BASE_GOERLI } from '../token-provider';
+import { USDC_ARBITRUM, USDC_BASE, USDC_BASE_GOERLI } from '../token-provider';
 
 import { IV2SubgraphProvider, V2SubgraphPool } from './subgraph-provider';
 
@@ -13,32 +13,12 @@ type ChainTokenList = {
 };
 
 const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
-  // [ChainId.MAINNET]: [
-  //   WRAPPED_NATIVE_CURRENCY[ChainId.MAINNET]!,
-  //   DAI_MAINNET,
-  //   USDC_MAINNET,
-  //   USDT_MAINNET,
-  //   WBTC_MAINNET
-  // ],
-  // [ChainId.GOERLI]: [WRAPPED_NATIVE_CURRENCY[ChainId.GOERLI]!],
-  // [ChainId.SEPOLIA]: [WRAPPED_NATIVE_CURRENCY[ChainId.SEPOLIA]!],
-  // //v2 not deployed on [optimism, arbitrum, polygon, celo, gnosis, moonbeam, bnb, avalanche] and their testnets
   [ChainId.OPTIMISM]: [],
-  // [ChainId.ARBITRUM_ONE]: [],
-  // [ChainId.ARBITRUM_GOERLI]: [],
-  // [ChainId.OPTIMISM_GOERLI]: [],
-  // [ChainId.POLYGON]: [],
-  // [ChainId.POLYGON_MUMBAI]: [],
-  // [ChainId.CELO]: [],
-  // [ChainId.CELO_ALFAJORES]: [],
-  // [ChainId.GNOSIS]: [],
-  // [ChainId.MOONBEAM]: [],
-  // [ChainId.BNB]: [],
-  // [ChainId.AVALANCHE]: [],
   [ChainId.BASE_GOERLI]: [USDC_BASE_GOERLI, WRAPPED_NATIVE_CURRENCY[ChainId.BASE_GOERLI]],
   [ChainId.BASE]: [USDC_BASE, WRAPPED_NATIVE_CURRENCY[ChainId.BASE]],
   [ChainId.SCROLL_SEPOLIA]: [],
   [ChainId.SCROLL]: [],
+  [ChainId.ARBITRUM]: [WRAPPED_NATIVE_CURRENCY[ChainId.ARBITRUM], USDC_ARBITRUM],
 };
 
 /**

@@ -67,6 +67,16 @@ export const USDC_BASE_GOERLI = new Token(
   'USD Coin'
 );
 
+// Arbitrum
+
+export const USDC_ARBITRUM = new Token(
+  ChainId.ARBITRUM,
+  '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8',
+  6,
+  'USDC',
+  'USD Base Coin'
+);
+
 export class TokenProvider implements ITokenProvider {
   constructor(private chainId: ChainId, protected multicall2Provider: IMulticallProvider) {}
 
