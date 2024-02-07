@@ -7,11 +7,15 @@ import { log } from '../../util/log';
 import {
   ARB_ARBITRUM,
   DAI_ARBITRUM,
+  DAI_MODE,
   USDC_ARBITRUM,
   USDC_BASE,
   USDC_BASE_GOERLI,
+  USDC_MODE,
   USDT_ARBITRUM,
+  USDT_MODE,
   WBTC_ARBITRUM,
+  WBTC_MODE,
 } from '../token-provider';
 
 import { IV2SubgraphProvider, V2SubgraphPool } from './subgraph-provider';
@@ -34,6 +38,9 @@ const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
     USDT_ARBITRUM,
     ARB_ARBITRUM,
   ],
+  [ChainId.MODE]: [WRAPPED_NATIVE_CURRENCY[ChainId.MODE], WBTC_MODE, DAI_MODE, USDC_MODE, USDT_MODE],
+  [ChainId.MODE_TESTNET]: [WRAPPED_NATIVE_CURRENCY[ChainId.MODE_TESTNET]],
+  [ChainId.FRAX_TESTNET]: [WRAPPED_NATIVE_CURRENCY[ChainId.FRAX_TESTNET]],
 };
 
 /**

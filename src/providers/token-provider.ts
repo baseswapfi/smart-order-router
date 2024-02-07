@@ -106,6 +106,25 @@ export const ARB_ARBITRUM = new Token(
   'Arbitrum'
 );
 
+// MODE
+
+export const USDC_MODE = new Token(ChainId.MODE, '0xd988097fb8612cc24eeC14542bC03424c656005f', 6, 'USDC', 'USDC');
+export const USDT_MODE = new Token(ChainId.MODE, '0xf0F161fDA2712DB8b566946122a5af183995e2eD', 6, 'USDT', 'Tether USD');
+export const DAI_MODE = new Token(
+  ChainId.MODE,
+  '0xE7798f023fC62146e8Aa1b36Da45fb70855a77Ea',
+  18,
+  'DAI',
+  'Dai Stablecoin'
+);
+export const WBTC_MODE = new Token(
+  ChainId.MODE,
+  '0xcDd475325D6F564d27247D1DddBb0DAc6fA0a5CF',
+  8,
+  'WBTC',
+  'Wrapped BTC'
+);
+
 export class TokenProvider implements ITokenProvider {
   constructor(private chainId: ChainId, protected multicall2Provider: IMulticallProvider) {}
 
@@ -243,6 +262,8 @@ export const DAI_ON = (chainId: ChainId): Token => {
   switch (chainId) {
     case ChainId.BASE:
       return DAI_BASE;
+    case ChainId.MODE:
+      return DAI_MODE;
     default:
       throw new Error(`Chain id: ${chainId} not supported`);
   }
@@ -250,8 +271,8 @@ export const DAI_ON = (chainId: ChainId): Token => {
 
 export const USDT_ON = (chainId: ChainId): Token => {
   switch (chainId) {
-    // case ChainId.BASE:
-    //   return USDT_BASE;
+    case ChainId.MODE:
+      return USDT_MODE;
     default:
       throw new Error(`Chain id: ${chainId} not supported`);
   }
@@ -263,6 +284,8 @@ export const USDC_ON = (chainId: ChainId): Token => {
       return USDC_BASE;
     case ChainId.BASE_GOERLI:
       return USDC_BASE_GOERLI;
+    case ChainId.MODE:
+      return USDC_MODE;
     default:
       throw new Error(`Chain id: ${chainId} not supported`);
   }

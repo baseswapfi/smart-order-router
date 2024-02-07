@@ -1,6 +1,6 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { ChainId, TradeType } from '@baseswapfi/sdk-core';
-import { PERMIT2_ADDRESS } from '@baseswapfi/universal-router-sdk';
+import { PERMIT2_ADDRESSES } from '@baseswapfi/permit2-sdk';
 import { BigNumber } from 'ethers/lib/ethers';
 
 import { SwapOptions, SwapRoute, SwapType } from '../routers';
@@ -122,7 +122,9 @@ export abstract class Simulator {
     const tokenContract = Erc20__factory.connect(inputAmount.currency.wrapped.address, provider);
 
     if (swapOptions.type == SwapType.UNIVERSAL_ROUTER) {
-      const permit2Allowance = await tokenContract.allowance(fromAddress, PERMIT2_ADDRESS);
+      const chainId = provider.network.chainId as ChainId;
+      const permitAddress = PERMIT2_ADDRESSES[chainId] || '';
+      const permit2Allowance = await tokenContract.allowance(fromAddress, permitAddress);
 
       // If a permit has been provided we don't need to check if UR has already been allowed.
       if (swapOptions.inputTokenPermit) {
@@ -137,7 +139,7 @@ export abstract class Simulator {
       }
 
       // Check UR has been approved from Permit2.
-      const permit2Contract = Permit2__factory.connect(PERMIT2_ADDRESS, provider);
+      const permit2Contract = Permit2__factory.connect(permitAddress, provider);
 
       const { amount: universalRouterAllowance, expiration: tokenExpiration } = await permit2Contract.allowance(
         fromAddress,

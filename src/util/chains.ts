@@ -115,6 +115,15 @@ export const WRAPPED_NATIVE_CURRENCY: { [chainId in ChainId]: Token } = {
     'WETH',
     'Wrapped Ether'
   ),
+  [ChainId.MODE]: new Token(ChainId.MODE, '0x4200000000000000000000000000000000000006', 18, 'WETH', 'Wrapped Ether'),
+  [ChainId.MODE_TESTNET]: new Token(
+    ChainId.MODE_TESTNET,
+    '0xeb72756ee12309Eae82a0deb9787e69f5b62949c',
+    18,
+    'WETH',
+    'Wrapped Ether'
+  ),
+  [ChainId.FRAX_TESTNET]: new Token(ChainId.FRAX_TESTNET, '', 18, 'WETH', 'Wrapped Ether'),
 };
 
 export class ExtendedEther extends Ether {

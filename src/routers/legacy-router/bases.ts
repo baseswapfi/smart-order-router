@@ -11,6 +11,10 @@ import {
   DAI_ARBITRUM,
   USDT_ARBITRUM,
   WBTC_ARBITRUM,
+  WBTC_MODE,
+  DAI_MODE,
+  USDC_MODE,
+  USDT_MODE,
 } from '../../providers/token-provider';
 import { WRAPPED_NATIVE_CURRENCY } from '../../util/chains';
 
@@ -33,6 +37,9 @@ export const BASES_TO_CHECK_TRADES_AGAINST = (_tokenProvider: ITokenProvider): C
       USDT_ARBITRUM,
       ARB_ARBITRUM,
     ],
+    [ChainId.MODE]: [WRAPPED_NATIVE_CURRENCY[ChainId.MODE], WBTC_MODE, DAI_MODE, USDC_MODE, USDT_MODE],
+    [ChainId.MODE_TESTNET]: [WRAPPED_NATIVE_CURRENCY[ChainId.MODE_TESTNET]],
+    [ChainId.FRAX_TESTNET]: [WRAPPED_NATIVE_CURRENCY[ChainId.FRAX_TESTNET]],
   };
 };
 
