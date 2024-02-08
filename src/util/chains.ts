@@ -123,7 +123,13 @@ export const WRAPPED_NATIVE_CURRENCY: { [chainId in ChainId]: Token } = {
     'WETH',
     'Wrapped Ether'
   ),
-  [ChainId.FRAX_TESTNET]: new Token(ChainId.FRAX_TESTNET, '', 18, 'WETH', 'Wrapped Ether'),
+  [ChainId.FRAX_TESTNET]: new Token(
+    ChainId.FRAX_TESTNET,
+    '0x4200000000000000000000000000000000000006',
+    18,
+    'WETH',
+    'Wrapped Ether'
+  ), // TODO: Filler address here
 };
 
 export class ExtendedEther extends Ether {
