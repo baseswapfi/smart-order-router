@@ -1,7 +1,7 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { BaseProvider } from '@ethersproject/providers';
 import { encodeMixedRouteToPath, MixedRouteSDK, Protocol } from '@baseswapfi/router-sdk';
-import { ChainId } from '@baseswapfi/sdk-core';
+import { CHAIN_TO_ADDRESSES_MAP, MIXED_ROUTE_QUOTER_V1_ADDRESSES, SupportedChainsType } from '@baseswapfi/sdk-core';
 import { encodeRouteToPath } from '@baseswapfi/v3-sdk2';
 import retry, { Options as RetryOptions } from 'async-retry';
 import _ from 'lodash';
@@ -11,7 +11,6 @@ import { MixedRoute, V2Route, V3Route } from '../routers/router';
 import { IMixedRouteQuoterV1__factory } from '../types/other/factories/IMixedRouteQuoterV1__factory';
 import { IQuoterV2__factory } from '../types/v3/factories/IQuoterV2__factory';
 import { ID_TO_NETWORK_NAME, metric, MetricLoggerUnit } from '../util';
-import { MIXED_ROUTE_QUOTER_V1_ADDRESSES, QUOTER_V2_ADDRESSES } from '../util/addresses';
 import { CurrencyAmount } from '../util/amounts';
 import { log } from '../util/log';
 import { routeToString } from '../util/routes';
@@ -254,7 +253,7 @@ export class OnChainQuoteProvider implements IOnChainQuoteProvider {
    * @param [quoterAddressOverride] Overrides the address of the quoter contract to use.
    */
   constructor(
-    protected chainId: ChainId,
+    protected chainId: SupportedChainsType | number,
     protected provider: BaseProvider,
     // Only supports Uniswap Multicall as it needs the gas limitting functionality.
     protected multicall2Provider: UniswapMulticallProvider,
@@ -289,7 +288,7 @@ export class OnChainQuoteProvider implements IOnChainQuoteProvider {
     }
     const quoterAddress = useMixedRouteQuoter
       ? MIXED_ROUTE_QUOTER_V1_ADDRESSES[this.chainId]
-      : QUOTER_V2_ADDRESSES[this.chainId];
+      : CHAIN_TO_ADDRESSES_MAP[this.chainId as SupportedChainsType].quoterAddress;
 
     if (!quoterAddress) {
       throw new Error(`No address for the quoter contract on chain id: ${this.chainId}`);

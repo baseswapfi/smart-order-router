@@ -1,11 +1,10 @@
 import { BigNumber } from '@ethersproject/bignumber';
-import { ChainId, Token } from '@baseswapfi/sdk-core';
-import { computePoolAddress, FeeAmount, Pool } from '@baseswapfi/v3-sdk2';
+import { ChainId, Token, V3_CORE_FACTORY_ADDRESSES } from '@baseswapfi/sdk-core';
+import { computePoolAddress, FeeAmount, Pool, POOL_INIT_CODE_HASH_MAP } from '@baseswapfi/v3-sdk2';
 import retry, { Options as RetryOptions } from 'async-retry';
 import _ from 'lodash';
 
 import { IUniswapV3PoolState__factory } from '../../types/v3/factories/IUniswapV3PoolState__factory';
-import { V3_CORE_FACTORY_ADDRESSES } from '../../util/addresses';
 import { log } from '../../util/log';
 import { poolToString } from '../../util/routes';
 import { IMulticallProvider, Result } from '../multicall-provider';
@@ -191,6 +190,7 @@ export class V3PoolProvider implements IV3PoolProvider {
       tokenA: token0,
       tokenB: token1,
       fee: feeAmount,
+      initCodeHashManualOverride: POOL_INIT_CODE_HASH_MAP[this.chainId]!,
     });
 
     this.POOL_ADDRESS_CACHE[cacheKey] = poolAddress;

@@ -1,12 +1,11 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { BaseProvider } from '@ethersproject/providers';
-import { ChainId } from '@baseswapfi/sdk-core';
+import { ChainId, MULTICALL_ADDRESSES } from '@baseswapfi/sdk-core';
 import _ from 'lodash';
 import stats from 'stats-lite';
 
 import { UniswapInterfaceMulticall } from '../types/v3/UniswapInterfaceMulticall';
 import { UniswapInterfaceMulticall__factory } from '../types/v3/factories/UniswapInterfaceMulticall__factory';
-import { UNISWAP_MULTICALL_ADDRESSES } from '../util/addresses';
 import { log } from '../util/log';
 
 import {
@@ -35,7 +34,7 @@ export class UniswapMulticallProvider extends IMulticallProvider<UniswapMultical
 
   constructor(protected chainId: ChainId, protected provider: BaseProvider, protected gasLimitPerCall = 1_000_000) {
     super();
-    const multicallAddress = UNISWAP_MULTICALL_ADDRESSES[this.chainId];
+    const multicallAddress = MULTICALL_ADDRESSES[this.chainId];
 
     if (!multicallAddress) {
       throw new Error(`No address for Uniswap Multicall Contract on chain id: ${chainId}`);
@@ -57,7 +56,7 @@ export class UniswapMulticallProvider extends IMulticallProvider<UniswapMultical
     const fragment = contractInterface.getFunction(functionName);
     const callData = contractInterface.encodeFunctionData(fragment, functionParams);
 
-    const calls = _.map(addresses, address => {
+    const calls = _.map(addresses, (address) => {
       return {
         target: address,
         callData,
@@ -88,7 +87,7 @@ export class UniswapMulticallProvider extends IMulticallProvider<UniswapMultical
 
       results.push({
         success: true,
-        result: (contractInterface.decodeFunctionResult(fragment, returnData) as unknown) as TReturn,
+        result: contractInterface.decodeFunctionResult(fragment, returnData) as unknown as TReturn,
       });
     }
 
@@ -113,7 +112,7 @@ export class UniswapMulticallProvider extends IMulticallProvider<UniswapMultical
     const gasLimitPerCall = additionalConfig?.gasLimitPerCallOverride ?? this.gasLimitPerCall;
     const blockNumberOverride = providerConfig?.blockNumber ?? undefined;
 
-    const calls = _.map(functionParams, functionParam => {
+    const calls = _.map(functionParams, (functionParam) => {
       const callData = contractInterface.encodeFunctionData(fragment, functionParam);
 
       return {
@@ -155,7 +154,7 @@ export class UniswapMulticallProvider extends IMulticallProvider<UniswapMultical
 
       results.push({
         success: true,
-        result: (contractInterface.decodeFunctionResult(fragment, returnData) as unknown) as TReturn,
+        result: contractInterface.decodeFunctionResult(fragment, returnData) as unknown as TReturn,
       });
     }
 
@@ -226,7 +225,7 @@ export class UniswapMulticallProvider extends IMulticallProvider<UniswapMultical
 
       results.push({
         success: true,
-        result: (contractInterface.decodeFunctionResult(fragment, returnData) as unknown) as TReturn,
+        result: contractInterface.decodeFunctionResult(fragment, returnData) as unknown as TReturn,
       });
     }
 

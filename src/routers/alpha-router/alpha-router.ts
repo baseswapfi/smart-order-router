@@ -400,39 +400,39 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
       this.onChainQuoteProvider = onChainQuoteProvider;
     } else {
       switch (chainId) {
-        case ChainId.OPTIMISM:
-          this.onChainQuoteProvider = new OnChainQuoteProvider(
-            chainId,
-            provider,
-            this.multicall2Provider,
-            {
-              retries: 2,
-              minTimeout: 100,
-              maxTimeout: 1000,
-            },
-            {
-              multicallChunk: 110,
-              gasLimitPerCall: 1_200_000,
-              quoteMinSuccessRate: 0.1,
-            },
-            {
-              gasLimitOverride: 3_000_000,
-              multicallChunk: 45,
-            },
-            {
-              gasLimitOverride: 3_000_000,
-              multicallChunk: 45,
-            },
-            {
-              baseBlockOffset: -10,
-              rollback: {
-                enabled: true,
-                attemptsBeforeRollback: 1,
-                rollbackBlockOffset: -10,
-              },
-            }
-          );
-          break;
+        // case ChainId.OPTIMISM:
+        //   this.onChainQuoteProvider = new OnChainQuoteProvider(
+        //     chainId,
+        //     provider,
+        //     this.multicall2Provider,
+        //     {
+        //       retries: 2,
+        //       minTimeout: 100,
+        //       maxTimeout: 1000,
+        //     },
+        //     {
+        //       multicallChunk: 110,
+        //       gasLimitPerCall: 1_200_000,
+        //       quoteMinSuccessRate: 0.1,
+        //     },
+        //     {
+        //       gasLimitOverride: 3_000_000,
+        //       multicallChunk: 45,
+        //     },
+        //     {
+        //       gasLimitOverride: 3_000_000,
+        //       multicallChunk: 45,
+        //     },
+        //     {
+        //       baseBlockOffset: -10,
+        //       rollback: {
+        //         enabled: true,
+        //         attemptsBeforeRollback: 1,
+        //         rollbackBlockOffset: -10,
+        //       },
+        //     }
+        //   );
+        //   break;
         case ChainId.BASE:
         case ChainId.BASE_GOERLI:
           this.onChainQuoteProvider = new OnChainQuoteProvider(

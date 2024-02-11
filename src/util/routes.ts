@@ -1,9 +1,8 @@
 import { Protocol } from '@baseswapfi/router-sdk';
-import { Percent } from '@baseswapfi/sdk-core';
+import { Percent, V3_CORE_FACTORY_ADDRESSES } from '@baseswapfi/sdk-core';
 import { Pool } from '@baseswapfi/v3-sdk2';
 import { Pair } from '@baseswapfi/v2-sdk';
 import _ from 'lodash';
-import { V3_CORE_FACTORY_ADDRESSES } from './addresses';
 
 import { RouteWithValidQuote } from '../routers/alpha-router';
 import { MixedRoute, V2Route, V3Route } from '../routers/router';
@@ -17,9 +16,9 @@ export const routeToString = (route: V3Route | V2Route | MixedRoute): string => 
       ? route.tokenPath
       : // MixedRoute and V2Route have path
         route.path;
-  const tokenPath = _.map(tokens, token => `${token.symbol}`);
+  const tokenPath = _.map(tokens, (token) => `${token.symbol}`);
   const pools = route.protocol === Protocol.V3 || route.protocol === Protocol.MIXED ? route.pools : route.pairs;
-  const poolFeePath = _.map(pools, pool => {
+  const poolFeePath = _.map(pools, (pool) => {
     return `${
       pool instanceof Pool
         ? ` -- ${pool.fee / 10000}% [${Pool.getAddress(

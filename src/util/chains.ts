@@ -1,10 +1,10 @@
 import { ChainId, Ether, NativeCurrency, Token } from '@baseswapfi/sdk-core';
 
-export const SUPPORTED_CHAINS: ChainId[] = [ChainId.BASE, ChainId.BASE_GOERLI];
+export const SUPPORTED_CHAINS: ChainId[] = [ChainId.BASE, ChainId.BASE_GOERLI, ChainId.MODE];
 
-export const V2_SUPPORTED = [ChainId.BASE, ChainId.BASE_GOERLI];
+export const V2_SUPPORTED = [ChainId.BASE, ChainId.BASE_GOERLI, ChainId.MODE];
 
-export const HAS_L1_FEE = [ChainId.BASE, ChainId.BASE_GOERLI];
+export const HAS_L1_FEE = [ChainId.BASE, ChainId.BASE_GOERLI, ChainId.MODE];
 
 export const ID_TO_CHAIN_ID = (id: number): ChainId => {
   switch (id) {
@@ -12,6 +12,10 @@ export const ID_TO_CHAIN_ID = (id: number): ChainId => {
       return ChainId.BASE;
     case 84531:
       return ChainId.BASE_GOERLI;
+    case 34443:
+      return ChainId.MODE;
+    case 919:
+      return ChainId.MODE_TESTNET;
     default:
       throw new Error(`Unknown chain id: ${id}`);
   }
@@ -35,6 +39,8 @@ export enum ChainName {
   AVALANCHE = 'avalanche-mainnet',
   BASE = 'base-mainnet',
   BASE_GOERLI = 'base-goerli',
+  MODE = 'mode-mainnet',
+  MODE_TESTNET = 'mode-testnet',
 }
 
 export enum NativeCurrencyName {
@@ -50,10 +56,12 @@ export enum NativeCurrencyName {
 
 export const NATIVE_NAMES_BY_ID: { [chainId: number]: string[] } = {
   [ChainId.BASE]: ['ETH', 'ETHER', '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'],
+  [ChainId.MODE]: ['ETH', 'ETHER', '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'],
 };
 
 export const NATIVE_CURRENCY: { [chainId: number]: NativeCurrencyName } = {
   [ChainId.BASE]: NativeCurrencyName.ETHER,
+  [ChainId.MODE]: NativeCurrencyName.ETHER,
 };
 
 export const ID_TO_NETWORK_NAME = (id: number): ChainName => {
@@ -62,6 +70,10 @@ export const ID_TO_NETWORK_NAME = (id: number): ChainName => {
       return ChainName.BASE;
     case 84531:
       return ChainName.BASE_GOERLI;
+    case 34443:
+      return ChainName.MODE;
+    case 919:
+      return ChainName.MODE_TESTNET;
     default:
       throw new Error(`Unknown chain id: ${id}`);
   }

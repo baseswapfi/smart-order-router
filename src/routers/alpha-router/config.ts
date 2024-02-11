@@ -9,6 +9,7 @@ export const DEFAULT_ROUTING_CONFIG_BY_CHAIN = (chainId: ChainId): AlphaRouterCo
     // case ChainId.OPTIMISM_GOERLI:
     case ChainId.BASE:
     case ChainId.BASE_GOERLI:
+    case ChainId.MODE: // TODO: Check gas settings
       return {
         v2PoolSelection: {
           topN: 3,
