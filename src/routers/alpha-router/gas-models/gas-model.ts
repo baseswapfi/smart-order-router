@@ -3,7 +3,7 @@ import { ChainId, Token } from '@baseswapfi/sdk-core';
 import { Pool } from '@baseswapfi/v3-sdk2';
 
 import { ProviderConfig } from '../../../providers/provider';
-import { USDC_BASE } from '../../../providers/token-provider';
+import { USDC_BASE, USDC_MODE } from '../../../providers/token-provider';
 import { IV2PoolProvider } from '../../../providers/v2/pool-provider';
 import { ArbitrumGasData, IL2GasDataProvider, OptimismGasData } from '../../../providers/v3/gas-data-provider';
 import { CurrencyAmount } from '../../../util/amounts';
@@ -38,6 +38,7 @@ export const usdGasTokensByChain: { [chainId in ChainId]?: Token[] } = {
   // [ChainId.BNB]: [USDT_BNB, USDC_BNB, DAI_BNB],
   // [ChainId.AVALANCHE]: [DAI_AVAX, USDC_AVAX],
   [ChainId.BASE]: [USDC_BASE],
+  [ChainId.MODE]: [USDC_MODE],
 };
 
 export type L1ToL2GasCosts = {
