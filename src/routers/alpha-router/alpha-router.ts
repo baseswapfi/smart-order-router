@@ -435,6 +435,8 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
         //   break;
         case ChainId.BASE:
         case ChainId.BASE_GOERLI:
+        case ChainId.MODE:
+        case ChainId.MODE_TESTNET:
           this.onChainQuoteProvider = new OnChainQuoteProvider(
             chainId,
             provider,
@@ -567,7 +569,12 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
 
     this.swapRouterProvider = swapRouterProvider ?? new SwapRouterProvider(this.multicall2Provider, this.chainId);
 
-    if (chainId === ChainId.OPTIMISM || chainId === ChainId.BASE || chainId === ChainId.BASE_GOERLI || chainId === ChainId.MODE) {
+    if (
+      chainId === ChainId.OPTIMISM ||
+      chainId === ChainId.BASE ||
+      chainId === ChainId.BASE_GOERLI ||
+      chainId === ChainId.MODE
+    ) {
       this.l2GasDataProvider = optimismGasDataProvider ?? new OptimismGasDataProvider(chainId, this.multicall2Provider);
     }
     if (chainId === ChainId.ARBITRUM) {

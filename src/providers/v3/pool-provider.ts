@@ -23,7 +23,7 @@ type ISlot0 = {
 type ILiquidity = { liquidity: BigNumber };
 
 /**
- * Provider or getting V3 pools.
+ * Provider for getting V3 pools.
  *
  * @export
  * @interface IV3PoolProvider
