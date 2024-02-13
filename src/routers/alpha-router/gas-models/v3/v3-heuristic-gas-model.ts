@@ -71,7 +71,7 @@ export class V3HeuristicGasModelFactory extends IOnChainGasModelFactory {
       };
       let l1Used = BigNumber.from(0);
       let l1FeeInWei = BigNumber.from(0);
-      const opStackChains = [ChainId.OPTIMISM, ChainId.BASE, ChainId.BASE_GOERLI];
+      const opStackChains = [ChainId.OPTIMISM, ChainId.BASE, ChainId.BASE_GOERLI, ChainId.MODE];
       if (opStackChains.includes(chainId)) {
         [l1Used, l1FeeInWei] = this.calculateOptimismToL1SecurityFee(route, swapOptions, l2GasData as OptimismGasData);
       }

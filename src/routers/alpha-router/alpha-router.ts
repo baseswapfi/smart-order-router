@@ -567,7 +567,7 @@ export class AlphaRouter implements IRouter<AlphaRouterConfig>, ISwapToRatio<Alp
 
     this.swapRouterProvider = swapRouterProvider ?? new SwapRouterProvider(this.multicall2Provider, this.chainId);
 
-    if (chainId === ChainId.OPTIMISM || chainId === ChainId.BASE || chainId === ChainId.BASE_GOERLI) {
+    if (chainId === ChainId.OPTIMISM || chainId === ChainId.BASE || chainId === ChainId.BASE_GOERLI || chainId === ChainId.MODE) {
       this.l2GasDataProvider = optimismGasDataProvider ?? new OptimismGasDataProvider(chainId, this.multicall2Provider);
     }
     if (chainId === ChainId.ARBITRUM) {

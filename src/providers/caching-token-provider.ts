@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { log, WRAPPED_NATIVE_CURRENCY } from '../util';
 
 import { ICache } from './cache';
-import { ITokenProvider, TokenAccessor, USDC_BASE, USDC_BASE_GOERLI, USDC_OPTIMISM } from './token-provider';
+import { ITokenProvider, TokenAccessor, USDC_BASE, USDC_BASE_GOERLI, USDC_MODE, USDC_OPTIMISM } from './token-provider';
 
 // These tokens will added to the Token cache on initialization.
 export const CACHE_SEED_TOKENS: {
@@ -20,6 +20,10 @@ export const CACHE_SEED_TOKENS: {
   [ChainId.BASE_GOERLI]: {
     USDC: USDC_BASE_GOERLI,
     WETH: WRAPPED_NATIVE_CURRENCY[ChainId.BASE_GOERLI],
+  },
+  [ChainId.MODE]: {
+    USDC: USDC_MODE,
+    WETH: WRAPPED_NATIVE_CURRENCY[ChainId.MODE],
   },
   // Currently we do not have providers for Moonbeam mainnet or Gnosis testnet
 };

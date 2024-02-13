@@ -32,7 +32,7 @@ export class OptimismGasDataProvider implements IL2GasDataProvider<OptimismGasDa
   protected gasOracleAddress: string;
 
   constructor(protected chainId: ChainId, protected multicall2Provider: IMulticallProvider, gasPriceAddress?: string) {
-    if (chainId !== ChainId.BASE) {
+    if (chainId !== ChainId.BASE && chainId !== ChainId.MODE) {
       throw new Error('This data provider is used only on optimism networks.');
     }
     this.gasOracleAddress = gasPriceAddress ?? OVM_GASPRICE_ADDRESS;

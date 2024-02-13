@@ -4,7 +4,7 @@ import { FeeAmount } from '@baseswapfi/v3-sdk2';
 import _ from 'lodash';
 
 import { ITokenListProvider, IV2SubgraphProvider, V2SubgraphPool } from '../../../providers';
-import { ITokenProvider, USDC_BASE, USDC_OPTIMISM } from '../../../providers/token-provider';
+import { ITokenProvider, USDC_BASE, USDC_MODE, USDC_OPTIMISM } from '../../../providers/token-provider';
 import { IV2PoolProvider, V2PoolAccessor } from '../../../providers/v2/pool-provider';
 import { IV3PoolProvider, V3PoolAccessor } from '../../../providers/v3/pool-provider';
 import { IV3SubgraphProvider, V3SubgraphPool } from '../../../providers/v3/subgraph-provider';
@@ -74,6 +74,7 @@ export type MixedRouteGetCandidatePoolsParams = {
 const baseTokensByChain: { [chainId in ChainId]?: Token[] } = {
   [ChainId.OPTIMISM]: [USDC_OPTIMISM],
   [ChainId.BASE]: [USDC_BASE],
+  [ChainId.MODE]: [USDC_MODE],
 };
 
 export async function getV3CandidatePools({
