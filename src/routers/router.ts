@@ -73,6 +73,16 @@ export type SwapRoute = {
    * 2 if simulation was successful (simulated gas estimates are returned)
    */
   simulationStatus?: SimulationStatus;
+
+  /**
+   * Used internally within routing-api to see how many route requests
+   * hit the cached routes. This is used further down the line for future perf optimizations.
+   */
+  hitsCachedRoute?: boolean;
+  /**
+   * Portion amount either echoed from upstream routing-api for exact out or calculated from portionBips for exact in
+   */
+  portionAmount?: CurrencyAmount;
 };
 
 export type MethodParameters = SDKMethodParameters & { to: string };
