@@ -288,7 +288,7 @@ export class OnChainQuoteProvider implements IOnChainQuoteProvider {
     }
     const quoterAddress = useMixedRouteQuoter
       ? MIXED_ROUTE_QUOTER_V1_ADDRESSES[this.chainId]
-      : CHAIN_TO_ADDRESSES_MAP[this.chainId as SupportedChainsType].quoterAddress;
+      : CHAIN_TO_ADDRESSES_MAP[this.chainId]?.quoterAddress;
 
     if (!quoterAddress) {
       throw new Error(`No address for the quoter contract on chain id: ${this.chainId}`);
